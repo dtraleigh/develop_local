@@ -54,25 +54,20 @@ def get_subscribers_covered_changed_items(items_that_changed, covered_CACs_total
 
 
 def cac_lookup(address):
+    # address is just a number and street name
     locator = Nominatim(user_agent="myGeocoder")
 
-    try:
-        if address:
-            address = clean_address(address)
-            location = locator.geocode(address)
+    if address:
+        address = clean_address(address)  # this will append "Raleigh NC USA"
+        location = locator.geocode(address)
 
+        if location:
             cac = get_cac_location(location.latitude, location.longitude)
-
             return cac.name
         else:
             n = datetime.now()
-            logger.info(n.strftime("%H:%M %m-%d-%y") + ": Newly added item does not have an address.")
+            logger.info(n.strftime("%H:%M %m-%d-%y") + ": Address could not be geocoded.")
             return None
-    except AttributeError:
-        n = datetime.now()
-        logger.info(n.strftime("%H:%M %m-%d-%y") + "Unable to acquire position for ", address)
-
-    return None
 
 
 def clean_address(address):
