@@ -70,3 +70,25 @@ class LocationTestCase(TestCase):
         # Point outside Wake
         town3 = get_wake_location(35.7847746, 78.4949552)
         self.assertEqual(town3, None)
+
+    def test_calculate_cac(self):
+        url1 = "https://maps.raleighnc.gov/iMAPS/?pin=0772865947"
+        self.assertEqual(calculate_cac(url1), "West")
+
+        url2 = "https://maps.raleighnc.gov/iMAPS/?pin=0772865947,0772875055,0772875125,0772873120"
+        self.assertEqual(calculate_cac(url2), "West")
+
+        url3 = "https://maps.raleighnc.gov/iMAPS/?pin=1703569731"
+        self.assertEqual(calculate_cac(url3), "Central")
+
+        url4 = "https://maps.raleighnc.gov/iMAPS/?pin= 1703569731"
+        self.assertEqual(calculate_cac(url4), "Central")
+
+        url5 = "https://maps.raleighnc.gov/iMAPS/"
+        self.assertEqual(calculate_cac(url5), None)
+
+        url6 = ""
+        self.assertEqual(calculate_cac(url6), None)
+
+        url7 = None
+        self.assertEqual(calculate_cac(url7), None)

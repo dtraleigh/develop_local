@@ -8,6 +8,9 @@ from develop.management.commands.emails import *
 
 logger = logging.getLogger("django")
 
+# Testing notes
+# Everything but get_subscribers_covered_CACs() and get_subscribers_covered_changed_items()
+# should be covered. They will likely change soon.
 
 def get_subscribers_covered_CACs(subscriber):
     # Subscribers have "cover areas"
@@ -138,7 +141,17 @@ def calculate_cac(location_url):
     # This function takes in a location_url. We use the location_url string, extract the pin from it and retrieve
     # the address from json data returned from get_parcel_by_pin(). Using the address, we can use cac_lookup()
     # Ex: https://maps.raleighnc.gov/iMAPS/?pin=0772865947,0772875055,0772875125,0772873120
-    list_of_pins = location_url.split("=")[1].split(",")
+    if location_url:
+        try:
+            list_of_pins = location_url.split("=")[1].split(",")
+        except IndexError:
+            message = "location_url"
+            message += "location.calculate_cac: This url does not have pins"
+            send_email_notice(message, email_admins())
+            return None
+    else:
+        return None
+
     parcel_data = get_parcel_by_pin(list_of_pins[0])
 
     cac_name = cac_lookup(parcel_data["SITE_ADDRESS"])
