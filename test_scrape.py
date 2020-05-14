@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 
 from django.test import SimpleTestCase
+from django.test import TestCase
 from develop.management.commands.scrape import *
 
 
@@ -110,4 +111,45 @@ class ScrapeTestCase(SimpleTestCase):
         content3_souped = BeautifulSoup(content3, "html.parser")
 
         self.assertEqual(get_contact_url(content3_souped), None)
+
+
+class ScrapeTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Need to create 3 items to check against
+        SiteReviewCases.objects.create(case_number="Test-SR-2020",
+                                       cac="Central",
+                                       project_name="Test SR Project")
+        AdministrativeAlternates.objects.create(case_number="Test-AAD-2020",
+                                                cac="Central",
+                                                project_name="Test AAD Project")
+        TextChangeCases.objects.create(case_number="Test-TCC-2020",
+                                       project_name="Test TCC project")
+
+    def test_determine_if_known_case(self):
+        # Happy, easy match
+        known_sr_cases = SiteReviewCases.objects.all()
+        sr1 = determine_if_known_case(known_sr_cases, "Test-SR-2020", "Test SR Project", "Central")
+        self.assertEqual(sr1, known_sr_cases[0])
+
+        known_aad_cases = AdministrativeAlternates.objects.all()
+        aad1 = determine_if_known_case(known_aad_cases, "Test-AAD-2020", "Test AAD Project", "Central")
+        self.assertEqual(aad1, known_aad_cases[0])
+
+        known_tcc_cases = TextChangeCases.objects.all()
+        tcc1 = determine_if_known_case(known_tcc_cases, "Test-TCC-2020", "Test TCC Project", None)
+        self.assertEqual(tcc1, known_tcc_cases[0])
+
+        # Very different matches
+        known_sr_cases = SiteReviewCases.objects.all()
+        sr2 = determine_if_known_case(known_sr_cases, "Wrong-SR-2020", "Wrong SR Project", "North")
+        self.assertEqual(sr2, None)
+
+        known_aad_cases = AdministrativeAlternates.objects.all()
+        aad2 = determine_if_known_case(known_aad_cases, "Wrong-AAD-2020", "Wrong AAD Project", "North")
+        self.assertEqual(aad2, None)
+
+        known_tcc_cases = TextChangeCases.objects.all()
+        tcc2 = determine_if_known_case(known_tcc_cases, "Wrong-TCC-2020", "Wrong TCC Project", None)
+        self.assertEqual(tcc2, None)
 

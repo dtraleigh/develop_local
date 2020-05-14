@@ -19,6 +19,8 @@ logger = logging.getLogger("django")
 
 
 def get_everything_that_changed():
+    # Plans to deprecate this soon as we will move away from scanning for changes in the last hour.
+    ######
     # Get everything that has changed in the last hour
     everything_that_changed = []
 
@@ -45,49 +47,7 @@ def get_everything_that_changed():
     for TC in TCs_that_changed:
         everything_that_changed.append(TC)
     for zon in zons_that_changed:
-        # Not interested in some fields for zoning including OBJECTID, GlobalID, CreationDate
-        # (city seems to change these) so let's remove these items from zons_that_changed
-        # Need to first find all fields that have changed in this zon
-        # If the changes contain something else than OBJECTID, GlobalID, CreationDate, add to
-        # everything_that_changed.
-        # Else do not.
-        zon_most_recent = zon.history.first()
-        zon_previous = zon_most_recent.prev_record
-
-        # Get all the zoning fields
-        zon_fields = zon._meta.get_fields()
-
-        zon_fields_that_changed = []
-        zon_fields_we_dont_want = [Zoning._meta.get_field('OBJECTID'),
-                                   Zoning._meta.get_field('GlobalID'),
-                                   Zoning._meta.get_field('CreationDate')]
-
-        # Loop through each field, except created_date, modified_date, and id.
-        # If the fields are not equal, add it to output.
-        for field in zon_fields:
-            if field.name != "created_date" and field.name != "modified_date" and field.name != "id" and field.name != "EditDate":
-                # If its a web scrape, it won't have a lot fields and therefore, we can "skip" this.
-                try:
-                    item_most_recent_field = getattr(zon_most_recent, field.name)
-                    item_old_field = getattr(zon_previous, field.name)
-
-                    # If there is a difference...
-                    if item_most_recent_field != item_old_field:
-                        zon_fields_that_changed.append(field)
-                except AttributeError:
-                    # Just catch this for now and move on. Should be ok for the objects that are missing data.
-                    zon_fields_that_changed.append(field)
-
-        # check if zon_fields_that_changed contains any elements of zon_fields_we_dont_want but
-        # still may contain other fields we need to track.
-        if any(elem in zon_fields_that_changed for elem in zon_fields_we_dont_want):
-            # If there are fields in zon_fields_that_changed that are NOT in zon_fields_we_dont_want
-            for field in zon_fields_that_changed:
-                if field not in zon_fields_we_dont_want:
-                    everything_that_changed.append(zon)
-                    break
-        else:
-            everything_that_changed.append(zon)
+        everything_that_changed.append(zon)
 
     return everything_that_changed
 

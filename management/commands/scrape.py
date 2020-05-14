@@ -111,12 +111,12 @@ def determine_if_known_case(known_cases, case_number, project_name, cac):
     # 2 of 3 need to be true
     for case in known_cases:
         total_score = 0
-        case_number_score = fuzz.ratio(case_number, case.case_number)
-        project_name_score = fuzz.ratio(project_name, case.project_name)
+        case_number_score = fuzz.ratio(case_number.lower(), case.case_number.lower())
+        project_name_score = fuzz.ratio(project_name.lower(), case.project_name.lower())
 
         # TCs don't use CAC
         if cac:
-            cac_score = fuzz.ratio(cac, case.cac)
+            cac_score = fuzz.ratio(cac.lower(), case.cac.lower())
         else:
             cac_score = 0
 
