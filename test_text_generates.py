@@ -1,4 +1,5 @@
 from django.test import SimpleTestCase
+from django.test import TestCase
 from develop.management.commands.text_generates import *
 
 from django.conf import settings
@@ -16,3 +17,36 @@ class ScrapeTestCase(SimpleTestCase):
                              "")
             self.assertEqual(get_instance_text(""),
                              "")
+
+
+class ScrapeTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Need to create a few SRs
+        SiteReviewCases.objects.create(case_number="Test-SR-2020",
+                                       cac="Central",
+                                       cac_override=None,
+                                       project_name="Test SR Project")
+        SiteReviewCases.objects.create(case_number="Test-SR-2020",
+                                       cac="Central",
+                                       cac_override="South Central",
+                                       project_name="Test SR Project")
+        SiteReviewCases.objects.create(case_number="Test-SR-2020",
+                                       cac=None,
+                                       cac_override="South Central",
+                                       project_name="Test SR Project")
+        SiteReviewCases.objects.create(case_number="Test-SR-2020",
+                                       cac=None,
+                                       cac_override=None,
+                                       project_name="Test SR Project")
+
+    def test_add_debug_text(self):
+        all_test_items = SiteReviewCases.objects.all()
+        for item in all_test_items:
+            # debug_output = "    [DEBUG] CAC: " + item.cac + "\n"
+            # debug_output += "    [DEBUG] CAC Override: " + item.cac_override + "\n"
+
+            if settings.DEVELOP_INSTANCE == "Develop":
+                self.assertNotEqual(add_debug_text(item), "")
+            else:
+                self.assertEqual(add_debug_text(item), "")
