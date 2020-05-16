@@ -2,7 +2,7 @@ from django.test import SimpleTestCase
 from django.test import TestCase
 
 from develop.management.commands.location import *
-from develop import load_cac_shp, load_wake_shp
+from develop import load_shp
 
 class LocationSimpleTestCase(SimpleTestCase):
     def test_clean_address(self):
@@ -31,8 +31,8 @@ class LocationSimpleTestCase(SimpleTestCase):
 class LocationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        load_cac_shp.run()
-        load_wake_shp.run()
+        load_shp.run_cac()
+        load_shp.run_wake()
 
     def test_cac_lookup(self):
         # Address outside of Raleigh
