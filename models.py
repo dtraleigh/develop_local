@@ -49,7 +49,6 @@ class WakeCorporate(models.Model):
         return self.long_name
 
 
-# Auto-generated `LayerMapping` dictionary for WakeCorporate model
 wakecorporate_mapping = {
     'objectid': 'OBJECTID',
     'short_name': 'SHORT_NAME',
@@ -58,6 +57,26 @@ wakecorporate_mapping = {
     'effective_field': 'EFFECTIVE_',
     'shapearea': 'SHAPEAREA',
     'shapelen': 'SHAPELEN',
+    'geom': 'MULTIPOLYGON',
+}
+
+
+class WakeTownship(models.Model):
+    objectid = models.IntegerField()
+    ftr_code = models.IntegerField()
+    township = models.IntegerField()
+    name = models.CharField(max_length=14)
+    geom = models.MultiPolygonField(srid=4326)
+
+    def __str__(self):
+        return self.name
+
+
+waketownship_mapping = {
+    'objectid': 'OBJECTID',
+    'ftr_code': 'FTR_CODE',
+    'township': 'TOWNSHIP',
+    'name': 'NAME',
     'geom': 'MULTIPOLYGON',
 }
 

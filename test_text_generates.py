@@ -43,9 +43,6 @@ class ScrapeTestCase(TestCase):
     def test_add_debug_text(self):
         all_test_items = SiteReviewCases.objects.all()
         for item in all_test_items:
-            # debug_output = "    [DEBUG] CAC: " + item.cac + "\n"
-            # debug_output += "    [DEBUG] CAC Override: " + item.cac_override + "\n"
-
             if settings.DEVELOP_INSTANCE == "Develop":
                 self.assertNotEqual(add_debug_text(item), "")
             else:

@@ -34,6 +34,10 @@ class CitizenAdvisoryCouncilAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
 
+class WakeTownshipAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
 class coverAreaAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
@@ -100,3 +104,4 @@ admin.site.register(Zoning, ZoningAdmin)
 admin.site.register(AdministrativeAlternates, AADAdmin)
 admin.site.register(TextChangeCases, TCAdmin)
 admin.site.register(WakeCorporate, admin.GeoModelAdmin)
+admin.site.register(WakeTownship, admin.GeoModelAdmin)
