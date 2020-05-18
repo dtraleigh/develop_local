@@ -23,7 +23,6 @@ class CitizenAdvisoryCouncil(models.Model):
         return self.name
 
 
-# Auto-generated `LayerMapping` dictionary for CitizenAdvisoryCouncil model
 citizenadvisorycouncil_mapping = {
     'objectid': 'OBJECTID',
     'cac': 'CAC',
@@ -61,22 +60,20 @@ wakecorporate_mapping = {
 }
 
 
-class WakeTownship(models.Model):
+class TrackArea(models.Model):
     objectid = models.IntegerField()
-    ftr_code = models.IntegerField()
-    township = models.IntegerField()
-    name = models.CharField(max_length=14)
+    short_name = models.CharField(max_length=3)
+    long_name = models.CharField(max_length=13)
     geom = models.MultiPolygonField(srid=4326)
 
     def __str__(self):
-        return self.name
+        return self.long_name
 
 
-waketownship_mapping = {
+trackarea_mapping = {
     'objectid': 'OBJECTID',
-    'ftr_code': 'FTR_CODE',
-    'township': 'TOWNSHIP',
-    'name': 'NAME',
+    'short_name': 'SHORT_NAME',
+    'long_name': 'LONG_NAME',
     'geom': 'MULTIPOLYGON',
 }
 

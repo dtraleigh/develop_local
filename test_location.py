@@ -4,6 +4,7 @@ from django.test import TestCase
 from develop.management.commands.location import *
 from develop import load_shp
 
+
 class LocationSimpleTestCase(SimpleTestCase):
     def test_clean_address(self):
         address1 = "S West Street"
@@ -31,8 +32,15 @@ class LocationSimpleTestCase(SimpleTestCase):
 class LocationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        load_shp.run_cac()
-        load_shp.run_wake()
+        # load_shp.run_cac()
+        # load_shp.run_wake()
+
+        # Create ITB track area
+        TrackArea.objects.create(objectid=1,
+                                 short_name="ITB",
+                                 long_name="ITB Raleigh",
+                                 geom="SRID=4326;MULTIPOLYGON (((-78.64185332157282 35.82449433431104, -78.61541746952635 35.81447235351721, -78.59447478154075 35.77966398711266, -78.60031126835604 35.76100042600255, -78.6308669934502 35.74261114366089, -78.68099211551316 35.75236356501054, -78.68030547000522 35.77743573247331, -78.66554259158931 35.81391553970967, -78.64185332157282 35.82449433431104)))"
+                                 )
 
     def test_cac_lookup(self):
         # Address outside of Raleigh
@@ -70,6 +78,19 @@ class LocationTestCase(TestCase):
         # Point outside Wake
         town3 = get_wake_location(35.7847746, 78.4949552)
         self.assertEqual(town3, None)
+
+    def test_is_itb(self):
+        # Point in Raleigh
+        place_in_itb = is_itb(35.7765539, -78.6427196)
+        self.assertEqual(place_in_itb, True)
+
+        # Point in Cary
+        place_not_in_itb = is_itb(35.7913298, -78.7582525)
+        self.assertEqual(place_not_in_itb, False)
+
+        # bogus data
+        weird_place = is_itb(-350.7913298, 780.7582525)
+        self.assertEqual(weird_place, False)
 
     def test_calculate_cac(self):
         url1 = "https://maps.raleighnc.gov/iMAPS/?pin=0772865947"

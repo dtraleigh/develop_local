@@ -12,6 +12,7 @@ logger = logging.getLogger("django")
 # Everything but get_subscribers_covered_CACs() and get_subscribers_covered_changed_items()
 # should be covered. They will likely change soon.
 
+
 def get_subscribers_covered_CACs(subscriber):
     # Subscribers have "cover areas"
     # A cover area is a collection of CACs
@@ -102,7 +103,7 @@ def clean_address(address):
 
 def get_wake_location(lat, lon):
     """
-    Take in a lat and lon and check which muni it is in the wake app
+    Take in a lat and lon and check which muni it is in
     """
     pnt = Point(lon, lat)
     try:
@@ -113,13 +114,28 @@ def get_wake_location(lat, lon):
 
 def get_cac_location(lat, lon):
     """
-    Take in a lat and lon and check which cac it is in the cac app
+    Take in a lat and lon and check which cac it is in
     """
     pnt = Point(lon, lat)
     try:
         return CitizenAdvisoryCouncil.objects.get(geom__intersects=pnt)
     except:
         return None
+
+
+def is_itb(lat, lon):
+    """
+    Take in a lat and lon and return True if the point is inside the
+    ITB Raleigh TrackArea
+    """
+    pnt = Point(lon, lat)
+    itb = TrackArea.objects.get(short_name="ITB")
+
+    try:
+        if TrackArea.objects.get(geom__intersects=pnt) == itb:
+            return True
+    except TrackArea.DoesNotExist:
+        return False
 
 
 def get_parcel_by_pin(pin):
