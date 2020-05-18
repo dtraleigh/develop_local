@@ -58,13 +58,37 @@ def get_subscribers_covered_changed_items(items_that_changed, covered_CACs_total
 
 
 def get_itb_items(items_that_changed):
-    # For zoning requests, we want only want the ones that are itb
-    # tracked_items = []
-    #
-    # for item in items_that_changed:
-    #     if isinstance(item, Zoning):
-    #         #
-    pass
+    # For zoning requests, we want only the ones that are itb
+    tracked_items = []
+
+    for item in items_that_changed:
+        if isinstance(item, Zoning):
+            lat, lon = get_lat_lon_by_pin(get_pins_from_location_url(item.location_url)[0])
+            if is_itb(lat, lon):
+                tracked_items.append(item)
+        elif isinstance(item, TextChangeCases):
+            tracked_items.append(item)
+        # This doesn't enforce the cac_override principle but this works
+        # this will also go away soon.
+        elif item.cac or item.cac_override:
+            # We want to phase out covered areas. Let's just check that the
+            # CAC or CAC Override matches one of the downtown ones
+            central_cac = CitizenAdvisoryCouncil.objects.get(name="Central")
+            south_central_cac = CitizenAdvisoryCouncil.objects.get(name="South Central")
+            hw_cac = CitizenAdvisoryCouncil.objects.get(name="Hillsborough-Wade")
+            north_central_cac = CitizenAdvisoryCouncil.objects.get(name="North Central")
+            mordecai_cac = CitizenAdvisoryCouncil.objects.get(name="Mordecai")
+            five_points_cac = CitizenAdvisoryCouncil.objects.get(name="Five Points")
+            southwest_cac = CitizenAdvisoryCouncil.objects.get(name="Southwest")
+            dtr_cacs = [central_cac.name, south_central_cac.name, hw_cac.name, north_central_cac.name,
+                        mordecai_cac.name, five_points_cac.name, southwest_cac.name]
+
+            if item.cac in dtr_cacs:
+                tracked_items.append(item)
+            elif item.cac_override in dtr_cacs:
+                tracked_items.append(item)
+
+    return tracked_items
 
 
 def cac_lookup(address):
@@ -138,7 +162,7 @@ def get_cac_location(lat, lon):
 
 def is_itb(lat, lon):
     """
-    Take in a lat and lon and return True if the point is inside the
+    Take in a lat and lon (ints) and return True if the point is inside the
     ITB Raleigh TrackArea
     """
     pnt = Point(lon, lat)
@@ -164,7 +188,7 @@ def get_lat_lon_by_pin(pin):
     if response.status_code == 200:
         coordinates = response.json()["features"][0]["geometry"]
         return coordinates["y"], coordinates["x"]
-    return response
+    return None, None
 
 
 def get_parcel_by_pin(pin):
