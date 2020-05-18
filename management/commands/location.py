@@ -58,7 +58,12 @@ def get_subscribers_covered_changed_items(items_that_changed, covered_CACs_total
 
 
 def get_itb_items(items_that_changed):
-    # For zoning requests, we want to get the lat lon
+    # For zoning requests, we want only want the ones that are itb
+    # tracked_items = []
+    #
+    # for item in items_that_changed:
+    #     if isinstance(item, Zoning):
+    #         #
     pass
 
 
@@ -177,13 +182,11 @@ def get_parcel_by_pin(pin):
     return response
 
 
-def calculate_cac(location_url):
-    # This function takes in a location_url. We use the location_url string, extract the pin from it and retrieve
-    # the address from json data returned from get_parcel_by_pin(). Using the address, we can use cac_lookup()
-    # Ex: https://maps.raleighnc.gov/iMAPS/?pin=0772865947,0772875055,0772875125,0772873120
+def get_pins_from_location_url(location_url):
+    # This function takes in a location_url. We use the location_url string, extract the pins, and return them.
     if location_url:
         try:
-            list_of_pins = location_url.split("=")[1].split(",")
+            return location_url.replace(" ", "").split("=")[1].split(",")
         except IndexError:
             message = "location_url"
             message += "location.calculate_cac: This url does not have pins"
@@ -192,7 +195,17 @@ def calculate_cac(location_url):
     else:
         return None
 
-    parcel_data = get_parcel_by_pin(list_of_pins[0])
+
+def calculate_cac(location_url):
+    # This function takes in a location_url. Using get_pins_from_location_url(), we take the first pin and pass it into
+    # get_parcel_by_pin(). Using the address from the json, we can use cac_lookup()
+    # Ex: https://maps.raleighnc.gov/iMAPS/?pin=0772865947,0772875055,0772875125,0772873120
+
+    list_of_pins = get_pins_from_location_url(location_url)
+    if list_of_pins:
+        parcel_data = get_parcel_by_pin(list_of_pins[0])
+    else:
+        return None
 
     cac_name = cac_lookup(parcel_data["SITE_ADDRESS"])
 

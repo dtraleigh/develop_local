@@ -117,3 +117,25 @@ class LocationTestCase(TestCase):
 
         url7 = None
         self.assertEqual(calculate_cac(url7), None)
+
+    def test_get_pins_from_location_url(self):
+        url1 = "https://maps.raleighnc.gov/iMAPS/?pin=0772865947"
+        self.assertEqual(get_pins_from_location_url(url1), ["0772865947"])
+
+        url2 = "https://maps.raleighnc.gov/iMAPS/?pin=0772865947,0772875055,0772875125,0772873120"
+        self.assertEqual(get_pins_from_location_url(url2), ["0772865947", "0772875055", "0772875125", "0772873120"])
+
+        url3 = "https://maps.raleighnc.gov/iMAPS/?pin=1703569731"
+        self.assertEqual(get_pins_from_location_url(url3), ["1703569731"])
+
+        url4 = "https://maps.raleighnc.gov/iMAPS/?pin= 1703569731"
+        self.assertEqual(get_pins_from_location_url(url4), ["1703569731"])
+
+        url5 = "https://maps.raleighnc.gov/iMAPS/"
+        self.assertEqual(get_pins_from_location_url(url5), None)
+
+        url6 = ""
+        self.assertEqual(get_pins_from_location_url(url6), None)
+
+        url7 = None
+        self.assertEqual(get_pins_from_location_url(url7), None)
