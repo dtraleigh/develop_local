@@ -32,8 +32,8 @@ class LocationSimpleTestCase(SimpleTestCase):
 class LocationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # load_shp.run_cac()
-        # load_shp.run_wake()
+        load_shp.run_cac()
+        load_shp.run_wake()
 
         # Create ITB track area
         TrackArea.objects.create(objectid=1,

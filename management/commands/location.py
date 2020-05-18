@@ -1,4 +1,4 @@
-import logging, requests
+import logging, requests, geopy
 from datetime import datetime
 from geopy.geocoders import Nominatim
 
@@ -63,7 +63,10 @@ def cac_lookup(address):
 
     if address:
         address = clean_address(address)  # this will append "Raleigh NC USA"
-        location = locator.geocode(address)
+        try:
+            location = locator.geocode(address)
+        except geopy.exc.GeocoderTimedOut:
+            return None
 
         if location:
             cac = get_cac_location(location.latitude, location.longitude)
