@@ -57,6 +57,11 @@ def get_subscribers_covered_changed_items(items_that_changed, covered_CACs_total
     return covered_items
 
 
+def get_itb_items(items_that_changed):
+    # For zoning requests, we want to get the lat lon
+    pass
+
+
 def cac_lookup(address):
     # address is just a number and street name
     locator = Nominatim(user_agent="myGeocoder")
@@ -139,6 +144,22 @@ def is_itb(lat, lon):
             return True
     except TrackArea.DoesNotExist:
         return False
+
+
+def get_lat_lon_by_pin(pin):
+    # This uses the County's address point API and given a pin, we return the x (lon) and y (lat) coordinates
+    url = "https://maps.wakegov.com/arcgis/rest/services/Property/Addresses/MapServer/0/query?where=PIN_NUM=" + \
+          str(pin) + "&outFields=*&outSR=4326&f=json"
+
+    payload = {}
+    headers = {}
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+
+    if response.status_code == 200:
+        coordinates = response.json()["features"][0]["geometry"]
+        return coordinates["y"], coordinates["x"]
+    return response
 
 
 def get_parcel_by_pin(pin):

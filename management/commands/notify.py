@@ -72,13 +72,17 @@ class Command(BaseCommand):
                 all_active_subscribers = Subscriber.objects.filter(send_emails=True)
 
                 for subscriber in all_active_subscribers:
+                    #### Deprecated
                     # Get list of CACs we need to worry about for this subscriber
-                    covered_CACs_total = get_subscribers_covered_CACs(subscriber)
+                    # covered_CACs_total = get_subscribers_covered_CACs(subscriber)
 
                     # For this subscriber and the list everything_that_changed, get items that changed that
                     # this subscriber is covering
-                    covered_items = get_subscribers_covered_changed_items(everything_that_changed, covered_CACs_total)
-                    #print(covered_items)
+                    # covered_items = get_subscribers_covered_changed_items(everything_that_changed, covered_CACs_total)
+                    #### End deprecated
+
+                    # Take everything_that_changed and get the items that we want to post to discourse
+                    covered_items = get_itb_items(everything_that_changed)
 
                     # Post to discourse community
                     if covered_items and subscriber.is_bot:
