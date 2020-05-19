@@ -11,7 +11,6 @@ from django.core.management.base import BaseCommand
 from develop.models import *
 from datetime import datetime
 
-from .api_scans import development_api_scan, zoning_api_scan
 from .emails import *
 logger = logging.getLogger("django")
 
