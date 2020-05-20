@@ -3,7 +3,7 @@
   {% block content %}
   <body>
     {% load leaflet_tags %}
-    {% leaflet_map "cac_map" callback="window.map_init_basic" %}
+    {% leaflet_map "itb_map" callback="window.map_init_basic" %}
   </body>
   <script type="text/javascript">
       function map_init_basic (map, options) {
@@ -11,9 +11,9 @@
 
           L.geoJSON(geojsonFeature).addTo(map);
       }
-    </script>
+  </script>
   <script type="text/javascript">
     // Add geojson data here so the source is a little easier to read.
-    var geojsonFeature = {{cac_data|safe}};
+    var geojsonFeature = {{itb_data|safe}};
   </script>
   {%endblock content%}

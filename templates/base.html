@@ -1,19 +1,24 @@
-{% load leaflet_map %}
-<!DOCTYPE html>
+{% load static %}
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="">
-	<meta name="author" content="">
-
-	<title>CAC</title>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+      }
+      .leaflet-container {
+        height: 100%;
+      }
+    </style>
+    <title>Develop Maps</title>
+    {% load leaflet_tags %}
     {% leaflet_js %}
     {% leaflet_css %}
-</head>
-<body>
+  </head>
 
-{% block content %}{% endblock %}
-
-</body>
+    {% block content %}{% endblock %}
 </html>
