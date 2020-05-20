@@ -13,7 +13,24 @@
 
     <script type="text/javascript">
     function map_init_basic (map, options) {
-        L.marker([50.5, 30.5]).addTo(map);
+        // L.marker([50.5, 30.5]).addTo(map);
+
+        // create a red polygon from an array of LatLng points
+        // var latlngs = 1;
+        // var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
+
+        // Try this
+        // var central = 2;
+        // var polygon = L.polygon(central, {color: 'red'}).addTo(map);
+
+        // var latlngs = [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]];
+        // var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
+        var geojsonFeature = {{data|safe}};
+
+        L.geoJSON(geojsonFeature).addTo(map);
+
+        // zoom the map to the polygon
+        // map.fitBounds(polygon.getBounds());
     }
     </script>
 

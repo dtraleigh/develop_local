@@ -1,7 +1,23 @@
-{% extends "base.html" %}
+{% load leaflet_map %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="">
+	<meta name="author" content="">
 
-{% block content %}
+	<title>CAC</title>
+    {% leaflet_js %}
+    {% leaflet_css %}
+</head><body>
+    <script>
+    function map_init_basic (map, options) {
+        L.marker([35.8121519,-78.6752995]).addTo(map);
+    }
+    </script>
 
-{% leaflet_map "cac_map" %}
-
-{%endblock content%}
+    {% leaflet_map "yourmap" callback="window.map_init_basic" %}
+<p>Hi!</p>
+</body>
+</html>
