@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.gis.db.models.functions import AsGeoJSON
-import json
+import json, requests
 from django.core.serializers import serialize
 from develop.models import CitizenAdvisoryCouncil, TrackArea, coverArea
 
