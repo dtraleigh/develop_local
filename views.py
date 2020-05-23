@@ -6,6 +6,7 @@ from arcgis2geojson import arcgis2geojson
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 
+@xframe_options_exempt
 def cac(request):
     itb_cacs = coverArea.objects.get(name="Downtown")
     cac_data = serialize("geojson", itb_cacs.CACs.all(), geometry_field="geom", fields=("name",))
@@ -13,6 +14,7 @@ def cac(request):
     return render(request, "cac.html", {"cac_data": cac_data})
 
 
+@xframe_options_exempt
 def itb(request):
     itb_data = serialize("geojson", TrackArea.objects.all(), geometry_field="geom", fields=("long_name",))
 

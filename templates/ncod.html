@@ -10,8 +10,15 @@
       map.setView([35.7785733,-78.6395438], 11);
 
       function onEachFeature(feature, layer) {
-        var popupContent = "<p>" + feature.properties.OLAY_NAME + " NCOD</p>";
-        layer.bindPopup(popupContent);
+        var effective = new Date(feature.properties.EFF_DATE)
+
+        var popupContent = '<h2>'+feature.properties.OLAY_NAME+'</h2>';
+        popupContent += '<table width=400>';
+        popupContent += '<tr><td>Effective Date</td><td>'+(effective.getMonth() + 1)+'/'+effective.getDate()+'/'+effective.getFullYear()+'</td></tr>';
+        popupContent += '<tr><td>Zoning Case</td><td>'+feature.properties.ZONE_CASE+'</td></tr>';
+        popupContent += '<tr><td>Area</td><td>'+(feature.properties.SHAPE_Area/43560).toFixed(2)+' Acres</td></tr>';
+        popupContent += '</table>';
+        layer.bindPopup(popupContent, { maxWidth: 600 });
       }
 
       L.geoJSON(geojsonFeature, {
