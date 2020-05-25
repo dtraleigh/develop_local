@@ -105,52 +105,89 @@ class Subscriber(models.Model):
         return u"%s (%s)" % (self.name, self.email)
 
 
-class Development(models.Model):
-    # Development is an item produced by the Development API
-    OBJECTID = models.IntegerField(verbose_name="Object ID")
-    devplan_id = models.IntegerField(blank=True, null=True, verbose_name="Development Plan ID")
-    submitted = models.BigIntegerField(blank=True, null=True, verbose_name="Submitted")
-    submitted_yr = models.SmallIntegerField(blank=True, null=True, verbose_name="Year Submitted")
-    approved = models.BigIntegerField(blank=True, null=True, verbose_name="Approved")
-    daystoapprove = models.IntegerField(blank=True, null=True, verbose_name="Days to Approve")
-    plan_type = models.CharField(blank=True, max_length=100, null=True, verbose_name="Plan Type")
-    status = models.CharField(blank=True, max_length=100, null=True, verbose_name="Status")
-    appealperiodends = models.BigIntegerField(blank=True, null=True, verbose_name="Appeal Period Ends")
-    updated = models.BigIntegerField(blank=True, null=True, verbose_name="Updated")
-    sunset_date = models.BigIntegerField(blank=True, null=True, verbose_name="Sunset Date")
-    acreage = models.CharField(blank=True, max_length=100, null=True, verbose_name="Acreage") #Need to convert from decimal to char
-    major_street = models.CharField(blank=True, max_length=100, null=True, verbose_name="Major Street")
-    cac = models.CharField(blank=True, max_length=100, null=True, verbose_name="CAC")
-    cac_override = models.CharField(blank=True, max_length=100, null=True, verbose_name="CAC Override")
-    engineer = models.CharField(blank=True, max_length=100, null=True, verbose_name="Engineer")
-    engineer_phone = models.CharField(blank=True, max_length=100, null=True, verbose_name="Engineer Phone")
-    developer = models.CharField(blank=True, max_length=100, null=True, verbose_name="Developer")
-    developer_phone = models.CharField(blank=True, max_length=100, null=True, verbose_name="Developer Phone")
-    plan_name = models.CharField(blank=True, max_length=300, null=True, verbose_name="Plan Name")
-    planurl = models.TextField(blank=True, null=True, verbose_name="Plan URL")
-    planurl_approved = models.TextField(blank=True, null=True, verbose_name="Plan URL Approved")
-    planner = models.CharField(blank=True, max_length=100, null=True, verbose_name="Planner")
-    lots_req = models.IntegerField(blank=True, null=True, verbose_name="Lots Req")
-    lots_rec = models.IntegerField(blank=True, null=True, verbose_name="Lots Rec")
-    lots_apprv = models.IntegerField(blank=True, null=True, verbose_name="Lots Approved")
-    sq_ft_req = models.IntegerField(blank=True, null=True, verbose_name="Square Feet Req")
-    units_apprv = models.IntegerField(blank=True, null=True, verbose_name="Units Approved")
-    units_req = models.IntegerField(blank=True, null=True, verbose_name="Units Req")
-    zoning = models.CharField(blank=True, max_length=100, null=True, verbose_name="Zoning")
-    plan_number = models.CharField(blank=True, max_length=100, null=True, verbose_name="Plan Number")
-    CreationDate = models.BigIntegerField(blank=True, null=True, verbose_name="Creation Date")
-    Creator = models.CharField(blank=True, max_length=100, null=True, verbose_name="Creator")
-    EditDate = models.BigIntegerField(blank=True, null=True, verbose_name="Edit Date")
-    Editor = models.CharField(blank=True, max_length=100, null=True, verbose_name="Editor")
+class DevelopmentPlan(models.Model):
+    objectid = models.IntegerField()
+    devplan_id = models.IntegerField()
+    submitted = models.DateField()
+    submitted_field = models.IntegerField()
+    approved = models.DateField()
+    daystoappr = models.IntegerField()
+    plan_type = models.CharField(max_length=39)
+    status = models.CharField(max_length=18)
+    appealperi = models.DateField()
+    updated = models.DateField()
+    sunset_dat = models.DateField()
+    acreage = models.FloatField()
+    major_stre = models.CharField(max_length=31)
+    cac = models.CharField(max_length=18)
+    engineer = models.CharField(max_length=35)
+    engineer_p = models.CharField(max_length=10)
+    developer = models.CharField(max_length=48)
+    developer_field = models.CharField(max_length=13)
+    plan_name = models.CharField(max_length=44)
+    planurl = models.CharField(max_length=107)
+    planurl_ap = models.CharField(max_length=1)
+    planner = models.CharField(max_length=30)
+    lots_req = models.IntegerField()
+    lots_rec = models.IntegerField()
+    lots_apprv = models.IntegerField()
+    sq_ft_req = models.IntegerField()
+    units_appr = models.IntegerField()
+    units_req = models.IntegerField()
+    zoning = models.CharField(max_length=34)
+    plan_numbe = models.CharField(max_length=15)
+    creationda = models.DateField()
+    creator = models.CharField(max_length=12)
+    editdate = models.DateField()
+    editor = models.CharField(max_length=12)
+    geom = models.PointField()
     history = HistoricalRecords()
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Development"
+        verbose_name = "Development Plan"
 
     def __str__(self):
-        return u"Dev - %s - %s (%s)" % (self.plan_name, self.devplan_id, self.submitted_yr)
+        return u"Dev - %s - %s (%s)" % (self.plan_name, self.devplan_id, self.submitted)
+
+    developmentplan_mapping = {
+        'objectid': 'OBJECTID',
+        'devplan_id': 'devplan_id',
+        'submitted': 'submitted',
+        'submitted_field': 'submitted_',
+        'approved': 'approved',
+        'daystoappr': 'daystoappr',
+        'plan_type': 'plan_type',
+        'status': 'status',
+        'appealperi': 'appealperi',
+        'updated': 'updated',
+        'sunset_dat': 'sunset_dat',
+        'acreage': 'acreage',
+        'major_stre': 'major_stre',
+        'cac': 'cac',
+        'engineer': 'engineer',
+        'engineer_p': 'engineer_p',
+        'developer': 'developer',
+        'developer_field': 'developer_',
+        'plan_name': 'plan_name',
+        'planurl': 'planurl',
+        'planurl_ap': 'planurl_ap',
+        'planner': 'planner',
+        'lots_req': 'lots_req',
+        'lots_rec': 'lots_rec',
+        'lots_apprv': 'lots_apprv',
+        'sq_ft_req': 'sq_ft_req',
+        'units_appr': 'units_appr',
+        'units_req': 'units_req',
+        'zoning': 'zoning',
+        'plan_numbe': 'plan_numbe',
+        'creationda': 'CreationDa',
+        'creator': 'Creator',
+        'editdate': 'EditDate',
+        'editor': 'Editor',
+        'geom': 'POINT',
+    }
 
 
 class SiteReviewCases(models.Model):

@@ -30,7 +30,7 @@ class ControlAdmin(admin.ModelAdmin):
     list_display = ("scrape", "scan", "notify")
 
 
-class coverAreaAdmin(admin.ModelAdmin):
+class CoverAreaAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
 
@@ -38,20 +38,10 @@ class SubscriberAdmin(admin.ModelAdmin):
     list_display = ("name", "email", "created_date", "modified_date", "send_emails", "is_bot", "topic_id")
 
 
-class DevelopmentsAdmin(SimpleHistoryAdmin):
-    list_display = ("OBJECTID", "plan_type", "updated_date", "submitted_yr", "status", "major_street", "cac", "cac_override",
-                    "plan_name", "plan_number", "modified_date", "created_date")
+class DevelopmentPlansAdmin(admin.OSMGeoAdmin):
+    list_display = ("objectid", "plan_type", "submitted", "status", "major_stre", "cac",
+                    "plan_name", "plan_numbe", "modified_date", "created_date")
     history_list_display = ["status"]
-    list_filter = (CACStatusFilter,)
-
-    def updated_date(self, obj):
-        if obj.updated:
-            return datetime.datetime.fromtimestamp(obj.updated / 1000).strftime('%Y-%m-%d %H:%M:%S')
-        else:
-            return "NA"
-
-    updated_date.short_description = 'Date Updated'
-    updated_date.admin_order_field = 'updated'
 
 
 class SiteReviewCasesAdmin(SimpleHistoryAdmin):
@@ -87,13 +77,13 @@ class TCAdmin(SimpleHistoryAdmin):
 
 
 admin.site.register(Control, ControlAdmin)
-admin.site.register(coverArea, coverAreaAdmin)
+admin.site.register(coverArea, CoverAreaAdmin)
 admin.site.register(SiteReviewCases, SiteReviewCasesAdmin)
 admin.site.register(Subscriber, SubscriberAdmin)
-admin.site.register(Development, DevelopmentsAdmin)
 admin.site.register(Zoning, ZoningAdmin)
 admin.site.register(AdministrativeAlternates, AADAdmin)
 admin.site.register(TextChangeCases, TCAdmin)
 admin.site.register(WakeCorporate, admin.OSMGeoAdmin)
 admin.site.register(CitizenAdvisoryCouncil, admin.OSMGeoAdmin)
 admin.site.register(TrackArea, admin.OSMGeoAdmin)
+admin.site.register(DevelopmentPlan, DevelopmentPlansAdmin)
