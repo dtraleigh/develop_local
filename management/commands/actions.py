@@ -33,12 +33,6 @@ def get_api_json(url):
     return response
 
 
-def batch(iterable, n=1):
-    l = len(iterable)
-    for ndx in range(0, l, n):
-        yield iterable[ndx:min(ndx + n, l)]
-
-
 def get_total_developments():
     # Example:
     # {
@@ -69,6 +63,7 @@ def get_all_ids(url):
     json_object_ids = get_api_json(url)
 
     try:
+        print("Number of ids: " + str(len(json_object_ids["objectIds"])))
         return json_object_ids["objectIds"]
     except KeyError:
         n = datetime.now()
@@ -78,12 +73,6 @@ def get_all_ids(url):
         logger.info(message)
         send_email_notice(message, email_admins())
         return None
-
-
-def get_dev_range_json(url):
-    # returns a range of dev json starting at one ID up until another
-
-    return get_api_json(url)
 
 
 def fields_are_same(object_item, api_or_web_scrape_item):
@@ -124,17 +113,13 @@ def api_object_is_different(known_object, item_json):
     # functions return True
     n = datetime.now()
 
-    list_of_Development_fields_to_compare = ["OBJECTID", "submitted_yr", "approved", "daystoapprove",
-                                             "plan_type", "status", "appealperiodends", "sunset_date", "acreage",
-                                             "major_street", "cac", "engineer", "engineer_phone", "developer",
-                                             "developer_phone", "plan_name", "planurl", "planurl_approved",
-                                             "planner", "lots_req", "lots_rec", "lots_apprv", "sq_ft_req",
-                                             "units_apprv", "units_req", "zoning", "plan_number", "CreationDate",
-                                             "Creator", "Editor"]
+    # Reducing the number of fields here in order to simplify the app. This function will get simpler later.
+    model_field_to_compare = ["status", "major_stre", "plan_name", "planurl", "zoning"]
 
-    if isinstance(known_object, Development):
-        for field in list_of_Development_fields_to_compare:
-            if not fields_are_same(str(getattr(known_object, field)), str(item_json[field])):
+    if isinstance(known_object, DevelopmentPlan):
+        for field in model_field_to_compare:
+            if not fields_are_same(str(getattr(known_object, field)),
+                                   str(item_json[DevelopmentPlan.developmentplan_mapping[field]])):
                 logger.info(n.strftime("%H:%M %m-%d-%y") + ": Difference found with " + str(field) +
                             " on Development " + str(known_object))
                 logger.info("Known_object: " +
@@ -150,26 +135,6 @@ def api_object_is_different(known_object, item_json):
                 logger.info("\nitem_json-------------->")
                 logger.info(item_json)
                 return True
-
-    list_of_Zoning_fields_to_compare = ["submittal_date", "petitioner", "location", "remarks", "zp_petition_acres",
-                                        "planning_commission_action", "city_council_action", "ph_date", "withdraw_date",
-                                        "exp_date_120_days", "exp_date_2_year", "ordinance_number", "received_by",
-                                        "last_revised", "drain_basin", "advisory_committee_areas",
-                                        "comprehensive_plan_districts", "GlobalID", "CreationDate", "EditDate"]
-
-    if isinstance(known_object, Zoning):
-        for field in list_of_Zoning_fields_to_compare:
-            # special case for CAC as it has a different name
-            if field == "advisory_committee_areas":
-                if not fields_are_same(str(known_object.cac), str(item_json["advisory_committee_areas"])):
-                    logger.info(n.strftime("%H:%M %m-%d-%y") + ": Difference found with " + str(field) +
-                                " on zoning case " + str(known_object))
-                    return True
-            else:
-                if not fields_are_same(str(getattr(known_object, field)), str(item_json[field])):
-                    logger.info(n.strftime("%H:%M %m-%d-%y") + ": Difference found with " + str(field) +
-                                " on zoning case " + str(known_object))
-                    return True
 
     # Returning false here basically means no difference was found
     return False

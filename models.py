@@ -107,40 +107,40 @@ class Subscriber(models.Model):
 
 class DevelopmentPlan(models.Model):
     objectid = models.IntegerField()
-    devplan_id = models.IntegerField()
-    submitted = models.DateField()
-    submitted_field = models.IntegerField()
-    approved = models.DateField()
-    daystoappr = models.IntegerField()
-    plan_type = models.CharField(max_length=39)
-    status = models.CharField(max_length=18)
-    appealperi = models.DateField()
-    updated = models.DateField()
-    sunset_dat = models.DateField()
-    acreage = models.FloatField()
-    major_stre = models.CharField(max_length=31)
-    cac = models.CharField(max_length=18)
-    engineer = models.CharField(max_length=35)
-    engineer_p = models.CharField(max_length=10)
-    developer = models.CharField(max_length=48)
-    developer_field = models.CharField(max_length=13)
-    plan_name = models.CharField(max_length=44)
-    planurl = models.CharField(max_length=107)
-    planurl_ap = models.CharField(max_length=1)
-    planner = models.CharField(max_length=30)
-    lots_req = models.IntegerField()
-    lots_rec = models.IntegerField()
-    lots_apprv = models.IntegerField()
-    sq_ft_req = models.IntegerField()
-    units_appr = models.IntegerField()
-    units_req = models.IntegerField()
-    zoning = models.CharField(max_length=34)
-    plan_numbe = models.CharField(max_length=15)
-    creationda = models.DateField()
-    creator = models.CharField(max_length=12)
-    editdate = models.DateField()
-    editor = models.CharField(max_length=12)
-    geom = models.PointField()
+    devplan_id = models.IntegerField(blank=True, null=True)
+    submitted = models.DateField(blank=True, null=True)
+    submitted_field = models.IntegerField(blank=True, null=True)
+    approved = models.DateField(blank=True, null=True)
+    daystoappr = models.IntegerField(blank=True, null=True)
+    plan_type = models.CharField(max_length=39, blank=True, null=True)
+    status = models.CharField(max_length=18, blank=True, null=True)
+    appealperi = models.DateField(blank=True, null=True)
+    updated = models.DateField(blank=True, null=True)
+    sunset_dat = models.DateField(blank=True, null=True)
+    acreage = models.FloatField(blank=True, null=True)
+    major_stre = models.CharField(max_length=31, blank=True, null=True)
+    cac = models.CharField(max_length=18, blank=True, null=True)
+    engineer = models.CharField(max_length=35, blank=True, null=True)
+    engineer_p = models.CharField(max_length=10, blank=True, null=True)
+    developer = models.CharField(max_length=48, blank=True, null=True)
+    developer_field = models.CharField(max_length=13, blank=True, null=True)
+    plan_name = models.CharField(max_length=44, blank=True, null=True)
+    planurl = models.CharField(max_length=107, blank=True, null=True)
+    planurl_ap = models.CharField(max_length=1, blank=True, null=True)
+    planner = models.CharField(max_length=30, blank=True, null=True)
+    lots_req = models.IntegerField(blank=True, null=True)
+    lots_rec = models.IntegerField(blank=True, null=True)
+    lots_apprv = models.IntegerField(blank=True, null=True)
+    sq_ft_req = models.IntegerField(blank=True, null=True)
+    units_appr = models.IntegerField(blank=True, null=True)
+    units_req = models.IntegerField(blank=True, null=True)
+    zoning = models.CharField(max_length=34, blank=True, null=True)
+    plan_numbe = models.CharField(max_length=15, blank=True, null=True)
+    creationda = models.DateField(blank=True, null=True)
+    creator = models.CharField(max_length=12, blank=True, null=True)
+    editdate = models.DateField(blank=True, null=True)
+    editor = models.CharField(max_length=12, blank=True, null=True)
+    geom = models.PointField(blank=True, null=True)
     history = HistoricalRecords()
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
@@ -151,28 +151,29 @@ class DevelopmentPlan(models.Model):
     def __str__(self):
         return u"Dev - %s - %s (%s)" % (self.plan_name, self.devplan_id, self.submitted)
 
+    # Model field: JSON field
     developmentplan_mapping = {
         'objectid': 'OBJECTID',
         'devplan_id': 'devplan_id',
         'submitted': 'submitted',
-        'submitted_field': 'submitted_',
+        'submitted_field': 'submitted_yr',
         'approved': 'approved',
-        'daystoappr': 'daystoappr',
+        'daystoappr': 'daystoapprove',
         'plan_type': 'plan_type',
         'status': 'status',
-        'appealperi': 'appealperi',
+        'appealperi': 'appealperiodends',
         'updated': 'updated',
-        'sunset_dat': 'sunset_dat',
+        'sunset_dat': 'sunset_date',
         'acreage': 'acreage',
-        'major_stre': 'major_stre',
+        'major_stre': 'major_street',
         'cac': 'cac',
         'engineer': 'engineer',
-        'engineer_p': 'engineer_p',
+        'engineer_p': 'engineer_phone',
         'developer': 'developer',
-        'developer_field': 'developer_',
+        'developer_field': 'developer_phone',
         'plan_name': 'plan_name',
         'planurl': 'planurl',
-        'planurl_ap': 'planurl_ap',
+        'planurl_ap': 'planurl_approved',
         'planner': 'planner',
         'lots_req': 'lots_req',
         'lots_rec': 'lots_rec',
@@ -181,8 +182,8 @@ class DevelopmentPlan(models.Model):
         'units_appr': 'units_appr',
         'units_req': 'units_req',
         'zoning': 'zoning',
-        'plan_numbe': 'plan_numbe',
-        'creationda': 'CreationDa',
+        'plan_numbe': 'plan_number',
+        'creationda': 'CreationDate',
         'creator': 'Creator',
         'editdate': 'EditDate',
         'editor': 'Editor',
