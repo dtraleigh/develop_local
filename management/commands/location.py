@@ -67,7 +67,7 @@ def get_itb_items(items_that_changed):
             if is_itb(lat, lon):
                 tracked_items.append(item)
         elif isinstance(item, DevelopmentPlan):
-            if is_itb(item.geom.y, item.geom.y):
+            if is_itb(item.geom.y, item.geom.x):
                 tracked_items.append(item)
         elif isinstance(item, TextChangeCases):
             tracked_items.append(item)

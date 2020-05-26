@@ -69,6 +69,7 @@ class Command(BaseCommand):
                 for subscriber in all_active_subscribers:
                     # Take everything_that_changed and get the items that we want to post to discourse
                     covered_items = get_itb_items(everything_that_changed)
+                    print(covered_items)
 
                     # Post to discourse community
                     if covered_items and subscriber.is_bot:

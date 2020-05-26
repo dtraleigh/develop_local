@@ -172,7 +172,6 @@ def get_new_dev_text(new_dev):
         new_devs_message += "    Status: " + str(new_dev.status) + "\n"
         new_devs_message += "    Major Street: " + str(new_dev.major_stre) + "\n"
         new_devs_message += "    URL: " + str(new_dev.planurl) + "\n\n"
-        new_devs_message += add_debug_text(new_dev)
     if isinstance(new_dev, SiteReviewCases):
         new_devs_message = "***" + str(new_dev.project_name) + ", " + str(new_dev.case_number) + "***\n"
         new_devs_message += get_instance_text("SR")
@@ -192,7 +191,6 @@ def get_updated_dev_text(updated_dev):
         updated_devs_message += "    Updated: " + string_output_unix_datetime(updated_dev.updated) + "\n"
         updated_devs_message += "    Status: " + str(updated_dev.status) + "\n"
         updated_devs_message += "    URL: " + str(updated_dev.planurl) + "\n\n"
-        updated_devs_message += add_debug_text(updated_dev)
         updated_devs_message += "  *UPDATES*\n"
         updated_devs_message += difference_email_output(updated_dev)
     if isinstance(updated_dev, SiteReviewCases):
