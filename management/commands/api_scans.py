@@ -9,9 +9,13 @@ logger = logging.getLogger("django")
 
 
 def clean_unix_date(unix_datetime):
-    if unix_datetime:
-        return datetime.utcfromtimestamp(unix_datetime / 1000)
-    return None
+    try:
+        if unix_datetime > 1000000000:
+            return datetime.utcfromtimestamp(unix_datetime / 1000)
+        return None
+    except TypeError:
+        return None
+
 
 
 def development_api_scan():
