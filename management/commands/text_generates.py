@@ -163,13 +163,14 @@ def add_debug_text(item):
 
 
 def get_new_dev_text(new_dev):
-    if isinstance(new_dev, Development):
-        new_devs_message = "***" + str(new_dev.plan_name) + ", " + str(new_dev.plan_number) + "***\n"
+    new_devs_message = ""
+    if isinstance(new_dev, DevelopmentPlan):
+        new_devs_message = "***" + str(new_dev.plan_name) + ", " + str(new_dev.plan_numbe) + "***\n"
         new_devs_message += get_instance_text("DEV")
-        new_devs_message += "    Submitted year: " + str(new_dev.submitted_yr) + "\n"
+        new_devs_message += "    Submitted year: " + str(new_dev.submitted_field) + "\n"
         new_devs_message += "    Plan type: " + str(new_dev.plan_type) + "\n"
         new_devs_message += "    Status: " + str(new_dev.status) + "\n"
-        new_devs_message += "    Major Street: " + str(new_dev.major_street) + "\n"
+        new_devs_message += "    Major Street: " + str(new_dev.major_stre) + "\n"
         new_devs_message += "    URL: " + str(new_dev.planurl) + "\n\n"
         new_devs_message += add_debug_text(new_dev)
     if isinstance(new_dev, SiteReviewCases):
@@ -184,8 +185,9 @@ def get_new_dev_text(new_dev):
 
 def get_updated_dev_text(updated_dev):
     # Need to look at the history and compare the most recent update with the one before it.
-    if isinstance(updated_dev, Development):
-        updated_devs_message = "***" + str(updated_dev.plan_name) + ", " + str(updated_dev.plan_number) + "***\n"
+    updated_devs_message = ""
+    if isinstance(updated_dev, DevelopmentPlan):
+        updated_devs_message = "***" + str(updated_dev.plan_name) + ", " + str(updated_dev.plan_numbe) + "***\n"
         updated_devs_message += get_instance_text("DEV")
         updated_devs_message += "    Updated: " + string_output_unix_datetime(updated_dev.updated) + "\n"
         updated_devs_message += "    Status: " + str(updated_dev.status) + "\n"

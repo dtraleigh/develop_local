@@ -25,8 +25,8 @@ def get_everything_that_changed():
     everything_that_changed = []
 
     # Let's exclude Development changes for now as we need to review the API content due to possible changes.
-    # devs_that_changed = Development.objects.filter(modified_date__range=[timezone.now() - timedelta(hours=1),
-    #                                                                      timezone.now()])
+    devs_that_changed = DevelopmentPlan.objects.filter(modified_date__range=[timezone.now() - timedelta(hours=1),
+                                                                             timezone.now()])
     SRs_that_changed = SiteReviewCases.objects.filter(modified_date__range=[timezone.now() - timedelta(hours=1),
                                                                             timezone.now()])
     zons_that_changed = Zoning.objects.filter(modified_date__range=[timezone.now() - timedelta(hours=1),
@@ -38,8 +38,8 @@ def get_everything_that_changed():
                                                                             timedelta(hours=1),
                                                                             timezone.now()])
 
-    # for dev in devs_that_changed:
-    #     everything_that_changed.append(dev)
+    for dev in devs_that_changed:
+        everything_that_changed.append(dev)
     for SR in SRs_that_changed:
         everything_that_changed.append(SR)
     for AAD in AADs_that_changed:
@@ -60,11 +60,6 @@ class Command(BaseCommand):
             everything_that_changed = get_everything_that_changed()
 
             if everything_that_changed:
-                if settings.DEVELOP_INSTANCE == "Develop":
-                    subject = "Update on Development Tracker [Develop]"
-                else:
-                    subject = "Update on Development Tracker"
-
                 # We need to filter everything_that_changed for only the cover areas that each user is subscribed to.
                 # We also need to include None. Rather than pass literally everything_that_changed let's filter it
                 # for each user and then send them an email.
@@ -72,15 +67,6 @@ class Command(BaseCommand):
                 all_active_subscribers = Subscriber.objects.filter(send_emails=True)
 
                 for subscriber in all_active_subscribers:
-                    #### Deprecated
-                    # Get list of CACs we need to worry about for this subscriber
-                    # covered_CACs_total = get_subscribers_covered_CACs(subscriber)
-
-                    # For this subscriber and the list everything_that_changed, get items that changed that
-                    # this subscriber is covering
-                    # covered_items = get_subscribers_covered_changed_items(everything_that_changed, covered_CACs_total)
-                    #### End deprecated
-
                     # Take everything_that_changed and get the items that we want to post to discourse
                     covered_items = get_itb_items(everything_that_changed)
 

@@ -160,7 +160,7 @@ def create_email_message(items_that_changed):
     updated_zons = []
 
     for item in items_that_changed:
-        if isinstance(item, Development) or isinstance(item, SiteReviewCases):
+        if isinstance(item, DevelopmentPlan) or isinstance(item, SiteReviewCases):
             if item.created_date > timezone.now() - timedelta(hours=1):
                 new_devs.append(item)
             else:
@@ -258,9 +258,9 @@ def create_new_discourse_post(subscriber, item):
     message = ""
 
     # Create discourse message
-    if isinstance(item, Development) or isinstance(item, SiteReviewCases):
+    if isinstance(item, DevelopmentPlan) or isinstance(item, SiteReviewCases):
         if item.created_date > timezone.now() - timedelta(hours=1):
-            message += "--------------New Development---------------\n\n"
+            message += "--------------New Development Plan---------------\n\n"
             message += get_new_dev_text(item)
         else:
             message = "--------------Existing Dev Update---------------\n\n"

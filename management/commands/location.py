@@ -66,6 +66,9 @@ def get_itb_items(items_that_changed):
             lat, lon = get_lat_lon_by_pin(get_pins_from_location_url(item.location_url)[0])
             if is_itb(lat, lon):
                 tracked_items.append(item)
+        elif isinstance(item, DevelopmentPlan):
+            if is_itb(item.geom.y, item.geom.y):
+                tracked_items.append(item)
         elif isinstance(item, TextChangeCases):
             tracked_items.append(item)
         # This doesn't enforce the cac_override principle but this works
