@@ -9,23 +9,6 @@ from simple_history.admin import SimpleHistoryAdmin
 from django.contrib.admin import ModelAdmin, SimpleListFilter
 
 
-class CACStatusFilter(SimpleListFilter):
-    title = 'CAC status'
-    parameter_name = 'items'
-
-    def lookups(self, request, model_admin):
-        return [
-            ('has_cac', 'CAC Assigned'),
-            ('no_cac', 'No CAC Assigned'),
-        ]
-
-    def queryset(self, request, queryset):
-        if self.value() == 'has_cac':
-            return Development.objects.filter(cac=None, cac_override=None)
-        if self.value():
-            return Development.objects.filter(cac=None, cac_override=None)
-
-
 class ControlAdmin(admin.ModelAdmin):
     list_display = ("scrape", "scan", "notify")
 
@@ -53,7 +36,6 @@ class SiteReviewCasesAdmin(SimpleHistoryAdmin):
 class ZoningAdmin(SimpleHistoryAdmin):
     list_display = ("zpyear", "zpnum", "submitted_date", "location", "remarks", "cac", "cac_override", "modified_date",
                     "created_date")
-    # history_list_display = ["status"]
 
     def submitted_date(self, obj):
         if obj.submittal_date:
@@ -62,7 +44,6 @@ class ZoningAdmin(SimpleHistoryAdmin):
             return "NA"
 
     submitted_date.short_description = 'Date Submitted'
-    # submitted_date.admin_order_field = 'updated'
 
 
 class AADAdmin(SimpleHistoryAdmin):
@@ -72,7 +53,7 @@ class AADAdmin(SimpleHistoryAdmin):
 
 
 class TCAdmin(SimpleHistoryAdmin):
-    list_display= ("case_number", "project_name", "status", "contact", "modified_date", "created_date")
+    list_display = ("case_number", "project_name", "status", "contact", "modified_date", "created_date")
     history_list_display = ["status"]
 
 
