@@ -141,6 +141,9 @@ class LocationTestCase(TestCase):
         the_pit = "328 W Davie St"
         self.assertEqual(cac_lookup(the_pit), "Central")
 
+        generates_none = "3020, 3060, 3061, 3100 Hodge Rd"
+        self.assertEqual(cac_lookup(generates_none), None)
+
     def test_get_cac_location(self):
         # Point in Central CAC
         cac1 = get_cac_location(35.7765539, -78.6427196)

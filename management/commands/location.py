@@ -107,11 +107,15 @@ def cac_lookup(address):
 
         if location:
             cac = get_cac_location(location.latitude, location.longitude)
-            return cac.name
+            if cac:
+                return cac.name
+            return None
         else:
             n = datetime.now()
             logger.info(n.strftime("%H:%M %m-%d-%y") + ": Address could not be geocoded.")
             return None
+
+    return None
 
 
 def clean_address(address):
@@ -239,7 +243,7 @@ def calculate_cac(location_url):
     if cac_name:
         return cac_name
     else:
-        message = "Location.calculate_and_update_cac: Could not calculate CAC for a zoning case."
+        message = "Location.calculate_cac: Could not calculate CAC for a zoning case."
         message += location_url
         send_email_notice(message, email_admins())
         return None
