@@ -78,7 +78,7 @@ class Command(BaseCommand):
                 message = "AAD Table has changed.\n"
                 x.add_row(aad_actual)
                 x.add_row(aad_expected)
-                message += x
+                message += str(x)
 
         # TCC tables
         tcc_expected = ['Case Number', 'Project Name/Location/Description', 'Status*', 'Contact']
@@ -98,7 +98,7 @@ class Command(BaseCommand):
                 message = "TCC Table has changed.\n"
                 x.add_row(tcc_actual)
                 x.add_row(tcc_expected)
-                message += x
+                message += str(x)
 
         # Zoning tables
         zon_expected = ['Case NumberMaster Plan Number			(Date uploaded)', 'Location/Status',
@@ -119,7 +119,7 @@ class Command(BaseCommand):
                 message = "Zon Table has changed.\n"
                 x.add_row(zon_actual)
                 x.add_row(zon_expected)
-                message += x
+                message += str(x)
 
         if message:
             send_email_notice(message, email_admins())
