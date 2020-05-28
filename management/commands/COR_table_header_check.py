@@ -81,7 +81,8 @@ class Command(BaseCommand):
                 message += str(x)
 
         # TCC tables
-        tcc_expected = ['Case Number', 'Project Name/Location/Description', 'Status*', 'Contact']
+        tcc_expected1 = ['Case Number', 'Project Name/Location/Description', 'Status*', 'Contact']
+        tcc_expected2 = ['Case Number', 'Project Name/Location/Description', 'Status', 'Contact']
         tcc_tables = get_page_content(tc_page_link).find_all("table")
         for tcc_table in tcc_tables:
             x = PrettyTable()
@@ -92,12 +93,13 @@ class Command(BaseCommand):
             for header in thead_row:
                 tcc_actual.append(header.get_text().strip())
 
-            if tcc_actual == tcc_expected:
+            if tcc_actual == tcc_expected1 or tcc_actual == tcc_expected2:
                 pass
             else:
                 message = "TCC Table has changed.\n"
                 x.add_row(tcc_actual)
-                x.add_row(tcc_expected)
+                x.add_row(tcc_expected1)
+                x.add_row(tcc_expected2)
                 message += str(x)
 
         # Zoning tables
