@@ -243,7 +243,7 @@ def calculate_cac(location_url):
     if cac_name:
         return cac_name
     else:
-        message = "Location.calculate_cac: Could not calculate CAC for a zoning case."
+        message = "Location.calculate_cac: Could not calculate CAC for " + str(location_url)
         message += location_url
         send_email_notice(message, email_admins())
         return None

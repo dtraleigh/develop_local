@@ -50,45 +50,23 @@ class LocationTestCase(TestCase):
         # Test zoning
         # 1. Zoning case 1 is in, 2 is out.
         # zoning with cac=None, cac_override=None
-        zon1 = Zoning.objects.create(OBJECTID=1,
-                              zpyear=2020,
-                              zpnum=14,
-                              location_url="https://maps.raleighnc.gov/iMAPS/?pin=1703886253")
+        zon1 = Zoning.objects.create(zpyear=2020,
+                                     zpnum=14,
+                                     location_url="https://maps.raleighnc.gov/iMAPS/?pin=1703886253")
 
-        zon2 = Zoning.objects.create(OBJECTID=2,
-                                     zpyear=2020,
+        zon2 = Zoning.objects.create(zpyear=2020,
                                      zpnum=15,
                                      location_url="https://maps.raleighnc.gov/iMAPS/?pin=1706662849")
 
         self.assertEqual(get_itb_items([zon1, zon2]), [zon1])
 
-        # 2. Zoning case 1 is in, 2 is out.
-        # zoning with cac=value, cac_override=None
-        zon1.cac = "Central"
-        zon1.save()
-        zon2.cac = "North"
-        zon2.save()
-
-        self.assertEqual(get_itb_items([zon1, zon2]), [zon1])
-
-        # 3. Zoning case 1 is in, 2 is out.
-        # zoning with cac=None, cac_override=value
-        zon1.cac = None
-        zon1.cac_override = "Central"
-        zon1.save()
-        zon2.cac = None
-        zon2.cac_override = "North"
-        zon2.save()
-
-        self.assertEqual(get_itb_items([zon1, zon2]), [zon1])
-
-        # 4. Add an AAD
+        # 2. Add an AAD
         tcc1 = TextChangeCases.objects.create(case_number="Test-TCC-2020",
                                               project_name="Test TCC project")
 
         self.assertEqual(get_itb_items([zon1, zon2, tcc1]), [zon1, tcc1])
 
-        # 5. Let's add SRs and AADs to the mix
+        # 3. Let's add SRs and AADs to the mix
         sr1 = SiteReviewCases.objects.create(case_number="Test-SR-2020",
                                              project_name="Test SR Project")
         aad1 = AdministrativeAlternates.objects.create(case_number="Test-AAD-2020",
@@ -96,28 +74,28 @@ class LocationTestCase(TestCase):
 
         self.assertEqual(get_itb_items([zon1, zon2, tcc1, sr1, aad1]), [zon1, tcc1])
 
-        # 6. sr and aad have cac in
+        # 4. sr and aad have cac in
         sr1.cac = "Central"
         sr1.save()
         aad1.cac = "Central"
         aad1.save()
         self.assertEqual(get_itb_items([zon1, zon2, tcc1, sr1, aad1]), [zon1, tcc1, sr1, aad1])
 
-        # 7. sr and aad have cac out
+        # 5. sr and aad have cac out
         sr1.cac = "North"
         sr1.save()
         aad1.cac = "North"
         aad1.save()
         self.assertEqual(get_itb_items([zon1, zon2, tcc1, sr1, aad1]), [zon1, tcc1])
 
-        # 8. sr and aad have cac_override out
+        # 6. sr and aad have cac_override out
         sr1.cac_override = "North"
         sr1.save()
         aad1.cac_override = "North"
         aad1.save()
         self.assertEqual(get_itb_items([zon1, zon2, tcc1, sr1, aad1]), [zon1, tcc1])
 
-        # 9. sr and aad have cac_override out
+        # 7. sr and aad have cac_override out
         sr1.cac = None
         sr1.cac_override = "North"
         sr1.save()
@@ -177,6 +155,10 @@ class LocationTestCase(TestCase):
 
         # bogus data
         weird_place = is_itb(-350.7913298, 780.7582525)
+        self.assertEqual(weird_place, False)
+
+        # what if none?
+        none_place = is_itb(None, None)
         self.assertEqual(weird_place, False)
 
     def test_calculate_cac(self):

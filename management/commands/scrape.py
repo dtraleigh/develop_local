@@ -460,10 +460,6 @@ def zoning_requests(page_content):
                     known_zon.plan_url = plan_url
                     known_zon.location_url = location_url
 
-                    # If we don't know the CAC, let's try and "calculate" it using the pin from location_url
-                    if not known_zon.cac and known_zon.cac_override:
-                        known_zon.cac_override = calculate_cac(location_url)
-
                     known_zon.save()
 
                     # Want to log what the difference is
@@ -489,13 +485,9 @@ def zoning_requests(page_content):
                 logger.info("location: " + location)
                 logger.info("**********************")
 
-                # Try to calculate CAC
-                cac_calc = calculate_cac(location_url)
-
                 Zoning.objects.create(zpyear=scrape_year,
                                       zpnum=scrape_num,
                                       status=status,
-                                      cac_override=cac_calc,
                                       location=location,
                                       received_by=contact,
                                       plan_url=plan_url,

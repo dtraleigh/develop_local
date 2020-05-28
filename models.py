@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.gis.db import models
-
 from simple_history.models import HistoricalRecords
 
 
@@ -213,43 +212,32 @@ class SiteReviewCases(models.Model):
 
 
 class Zoning(models.Model):
-    # Zoning is an item produced by the Zoning API
-    OBJECTID = models.IntegerField(blank=True, null=True, verbose_name="Object ID")
     zpyear = models.SmallIntegerField(blank=True, null=True, verbose_name="Year Submitted")
     zpnum = models.SmallIntegerField(blank=True, null=True, verbose_name="Zoning Number")
-    submittal_date = models.BigIntegerField(blank=True, null=True, verbose_name="Submitted")
-    petitioner = models.CharField(blank=True, max_length=300, null=True, verbose_name="Petitioner")
     location = models.CharField(blank=True, max_length=300, null=True, verbose_name="Location")
-    remarks = models.CharField(blank=True, max_length=300, null=True, verbose_name="Remarks") # API field
-    zp_petition_acres = models.CharField(blank=True, max_length=100, null=True, verbose_name="Acreage") # Need to convert from decimal to char
-    planning_commission_action = models.CharField(blank=True, max_length=300, null=True, verbose_name="PC Action")
-    city_council_action = models.CharField(blank=True, max_length=300, null=True, verbose_name="CC Action")
-    ph_date = models.BigIntegerField(blank=True, null=True, verbose_name="PH Date")
-    withdraw_date = models.BigIntegerField(blank=True, null=True, verbose_name="Withdraw Date")
-    exp_date_120_days = models.BigIntegerField(blank=True, null=True, verbose_name="Exp Date 120 Days")
-    exp_date_2_year = models.BigIntegerField(blank=True, null=True, verbose_name="Exp Date 2 Year")
-    ordinance_number = models.CharField(blank=True, max_length=300, null=True, verbose_name="Ordinance Number")
+    location_url = models.TextField(blank=True, null=True, verbose_name="Location URL")
+    status = models.CharField(blank=True, max_length=300, null=True, verbose_name="Status") # Web scrape field
+    plan_url = models.TextField(blank=True, null=True, verbose_name="Plan URL")
     received_by = models.CharField(blank=True, max_length=300, null=True, verbose_name="Received By")
-    last_revised = models.CharField(blank=True, max_length=300, null=True, verbose_name="Last Revised")
-    drain_basin = models.CharField(blank=True, max_length=300, null=True, verbose_name="Drain Basin")
-    cac = models.CharField(blank=True, max_length=300, null=True, verbose_name="CAC")
-    cac_override = models.CharField(blank=True, max_length=100, null=True, verbose_name="CAC Override")
-    comprehensive_plan_districts = models.CharField(blank=True, max_length=300, null=True, verbose_name="Comprehensive Plan Districts")
-    GlobalID = models.CharField(blank=True, max_length=300, null=True, verbose_name="Global ID")
-    CreationDate = models.BigIntegerField(blank=True, null=True, verbose_name="Creation Date")
-    EditDate = models.BigIntegerField(blank=True, null=True, verbose_name="Edit Date")
     history = HistoricalRecords()
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
-    status = models.CharField(blank=True, max_length=300, null=True, verbose_name="Status") # Web scrape field
-    plan_url = models.TextField(blank=True, null=True, verbose_name="Plan URL")
-    location_url = models.TextField(blank=True, null=True, verbose_name="Location URL")
 
     class Meta:
         verbose_name = "Zoning Request"
 
     def __str__(self):
         return u"Zone - %s (%s)" % (self.zpnum, self.zpyear)
+
+    @property
+    def short_location_url(self):
+        if self.location_url:
+            return self.location_url if len(self.location_url) < 35 else (self.location_url[:33] + '..')
+
+    @property
+    def short_plan_url(self):
+        if self.plan_url:
+            return self.plan_url if len(self.plan_url) < 35 else (self.plan_url[:33] + '..')
 
 
 class AdministrativeAlternates(models.Model):

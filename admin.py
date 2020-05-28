@@ -34,16 +34,8 @@ class SiteReviewCasesAdmin(SimpleHistoryAdmin):
 
 
 class ZoningAdmin(SimpleHistoryAdmin):
-    list_display = ("zpyear", "zpnum", "submitted_date", "location", "remarks", "cac", "cac_override", "modified_date",
-                    "created_date")
-
-    def submitted_date(self, obj):
-        if obj.submittal_date:
-            return datetime.datetime.fromtimestamp(obj.submittal_date / 1000).strftime('%Y-%m-%d %H:%M:%S')
-        else:
-            return "NA"
-
-    submitted_date.short_description = 'Date Submitted'
+    list_display = ("zpyear", "zpnum", "location", "status", "location", "short_location_url",
+                    "short_plan_url", "modified_date", "created_date")
 
 
 class AADAdmin(SimpleHistoryAdmin):
