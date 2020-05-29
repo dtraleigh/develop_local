@@ -212,9 +212,7 @@ def get_new_zon_text(new_zon):
     new_zon_message = "***" + str(new_zon.zpyear) + "-" + str(new_zon.zpnum) + "***\n"
     new_zon_message += get_instance_text("ZON")
     new_zon_message += "    Location: " + str(new_zon.location) + "\n"
-    new_zon_message += "    Remarks: " + str(new_zon.remarks).strip() + "\n"
     new_zon_message += "    Status: " + str(new_zon.status) + "\n"
-    new_zon_message += add_debug_text(new_zon)
 
     if new_zon.plan_url:
         new_zon_message += "    Plan URL: " + str(new_zon.plan_url) + "\n"
@@ -228,9 +226,7 @@ def get_updated_zon_text(updated_zon):
     updated_zon_message = "***" + str(updated_zon.zpyear) + "-" + str(updated_zon.zpnum) + "***\n"
     updated_zon_message += get_instance_text("ZON")
     updated_zon_message += "    Location: " + str(updated_zon.location) + "\n"
-    updated_zon_message += "    Remarks: " + str(updated_zon.remarks).strip() + "\n"
     updated_zon_message += "    Status: " + str(updated_zon.status) + "\n"
-    updated_zon_message += add_debug_text(updated_zon)
 
     if updated_zon.plan_url:
         updated_zon_message += "    Plan URL: " + str(updated_zon.plan_url) + "\n"

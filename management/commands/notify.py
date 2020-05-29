@@ -75,7 +75,7 @@ class Command(BaseCommand):
                         for item in covered_items:
                             create_new_discourse_post(subscriber, item)
                             # Alert admin if CAC is None
-                            if not isinstance(item, TextChangeCases):
+                            if not isinstance(item, TextChangeCases) and not isinstance(item, Zoning):
                                 if not item.cac and not item.cac_override:
                                     message = "notify: Need to add a CAC to " + str(item)
                                     send_email_notice(message, email_admins())
