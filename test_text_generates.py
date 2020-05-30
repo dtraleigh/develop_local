@@ -1,3 +1,4 @@
+from django.core import serializers
 from django.test import SimpleTestCase
 from django.test import TestCase
 from develop.management.commands.text_generates import *
@@ -22,23 +23,10 @@ class ScrapeTestCase(SimpleTestCase):
 class ScrapeTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Need to create a few SRs
-        SiteReviewCases.objects.create(case_number="Test-SR-2020",
-                                       cac="Central",
-                                       cac_override=None,
-                                       project_name="Test SR Project")
-        SiteReviewCases.objects.create(case_number="Test-SR-2020",
-                                       cac="Central",
-                                       cac_override="South Central",
-                                       project_name="Test SR Project")
-        SiteReviewCases.objects.create(case_number="Test-SR-2020",
-                                       cac=None,
-                                       cac_override="South Central",
-                                       project_name="Test SR Project")
-        SiteReviewCases.objects.create(case_number="Test-SR-2020",
-                                       cac=None,
-                                       cac_override=None,
-                                       project_name="Test SR Project")
+        # Creates 87 Dev plans that took place in 2020
+        with open("develop/test_data/test_data_DevelopmentPlans.json") as jsonfile:
+            for obj in serializers.deserialize("json", jsonfile):
+                obj.save()
 
     def test_add_debug_text(self):
         all_test_items = SiteReviewCases.objects.all()
