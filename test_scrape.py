@@ -5,7 +5,7 @@ from django.test import TestCase
 from develop.management.commands.scrape import *
 
 
-class ScrapeTestCase(SimpleTestCase):
+class ScrapeTestCaseSimple(SimpleTestCase):
     def test_get_page_content(self):
         # quick test to check that the sites we are scraping are returning data
         websites_used = [
@@ -113,7 +113,7 @@ class ScrapeTestCase(SimpleTestCase):
         self.assertEqual(get_contact_url(content3_souped), None)
 
 
-class ScrapeTestCase(TestCase):
+class ScrapeTestCaseDjango(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Need to create 3 items to check against

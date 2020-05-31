@@ -1,12 +1,14 @@
-from django.core import serializers
 from django.test import SimpleTestCase
 from django.test import TestCase
 from develop.management.commands.text_generates import *
+from develop.test_data import *
 
 from django.conf import settings
 
+from develop.test_data.create_test_data import *
 
-class ScrapeTestCase(SimpleTestCase):
+
+class TextGenTestCaseSimple(SimpleTestCase):
     def test_get_instance_text(self):
         if settings.DEVELOP_INSTANCE == "Develop":
             self.assertEqual(get_instance_text("DEV"),
@@ -20,13 +22,20 @@ class ScrapeTestCase(SimpleTestCase):
                              "")
 
 
-class ScrapeTestCase(TestCase):
+class TextGenTestCaseDjango(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Creates 87 Dev plans that took place in 2020
-        with open("develop/test_data/test_data_DevelopmentPlans.json") as jsonfile:
-            for obj in serializers.deserialize("json", jsonfile):
-                obj.save()
+        create_test_data_dev_plans()
+        create_test_data_aads()
+        create_test_data_zoning()
+        create_test_data_site_reviews()
+        create_test_data_tccs()
+
+        # print(len(DevelopmentPlan.objects.all()))
+        # print(len(SiteReviewCases.objects.all()))
+        # print(len(Zoning.objects.all()))
+        # print(len(AdministrativeAlternates.objects.all()))
+        # print(len(TextChangeCases.objects.all()))
 
     def test_add_debug_text(self):
         all_test_items = SiteReviewCases.objects.all()
