@@ -134,361 +134,361 @@ def determine_if_known_case(known_cases, case_number, project_name, cac):
 
 
 def site_reviews(page_content):
-    # Site Review tables
-    sr_tables = page_content.find_all("table")
+    if page_content:
+        sr_tables = page_content.find_all("table")
 
-    for sr_table in sr_tables:
-        sr_rows = get_rows_in_table(sr_table, "SR")
+        for sr_table in sr_tables:
+            sr_rows = get_rows_in_table(sr_table, "SR")
 
-        # For each row, get the values then check if we already know about this item
-        # If we do not, then add it to the DB
-        # If we do, check for differences and update it
-        for sr_row in sr_rows:
-            row_tds = sr_row.find_all("td")
+            # For each row, get the values then check if we already know about this item
+            # If we do not, then add it to the DB
+            # If we do, check for differences and update it
+            for sr_row in sr_rows:
+                row_tds = sr_row.find_all("td")
 
-            case_number = get_case_number_from_row(row_tds)
-            case_url = get_generic_link(row_tds[0])
+                case_number = get_case_number_from_row(row_tds)
+                case_url = get_generic_link(row_tds[0])
 
-            project_name = row_tds[1].get_text().strip()
-            cac = row_tds[2].get_text().strip()
-            status = row_tds[3].get_text().strip()
-            contact = get_contact(row_tds[4])
-            contact_url = get_contact_url(row_tds[4])
+                project_name = row_tds[1].get_text().strip()
+                cac = row_tds[2].get_text().strip()
+                status = row_tds[3].get_text().strip()
+                contact = get_contact(row_tds[4])
+                contact_url = get_contact_url(row_tds[4])
 
-            # If any of these variables are None, log it and move on.
-            if not case_number or not case_url or not project_name or not cac or not status or not contact:
-                scraped_info = [["row_tds", row_tds],
-                                ["case_number", case_number],
-                                ["case_url", case_url],
-                                ["project_name", project_name],
-                                ["cac", cac],
-                                ["status", status],
-                                ["contact", contact],
-                                ["contact_url", contact_url]]
-                message = "scrape.site_reviews: Problem scraping this row"
-                message += scraped_info
-                logger.info(message)
-                send_email_notice(message, email_admins())
+                # If any of these variables are None, log it and move on.
+                if not case_number or not case_url or not project_name or not cac or not status or not contact:
+                    scraped_info = [["row_tds", row_tds],
+                                    ["case_number", case_number],
+                                    ["case_url", case_url],
+                                    ["project_name", project_name],
+                                    ["cac", cac],
+                                    ["status", status],
+                                    ["contact", contact],
+                                    ["contact_url", contact_url]]
+                    message = "scrape.site_reviews: Problem scraping this row"
+                    message += scraped_info
+                    logger.info(message)
+                    send_email_notice(message, email_admins())
 
-                # Reminder: continue will move this to the next loop iteration.
-                continue
+                    # Reminder: continue will move this to the next loop iteration.
+                    continue
 
-            known_sr_cases = SiteReviewCases.objects.all()
-            known_sr_case = determine_if_known_case(known_sr_cases, case_number, project_name, cac)
+                known_sr_cases = SiteReviewCases.objects.all()
+                known_sr_case = determine_if_known_case(known_sr_cases, case_number, project_name, cac)
 
-            # if known_sr_case was found, check for differences
-            # if known_sr_case was not found, then we assume a new one was added
-            # need to create
-            if known_sr_case:
-                # Check for difference between known_sr_case and the variables
-                # Assume that the sr_case number doesn't change.
-                if (
-                    not fields_are_same(known_sr_case.case_url, case_url) or
-                    not fields_are_same(known_sr_case.project_name, project_name) or
-                    not fields_are_same(known_sr_case.cac, cac) or
-                    not fields_are_same(known_sr_case.status, status) or
-                    not fields_are_same(known_sr_case.contact, contact) or
-                    not fields_are_same(known_sr_case.contact_url, contact_url)
-                ):
-                    known_sr_case.case_url = case_url
-                    known_sr_case.project_name = project_name
-                    known_sr_case.cac = cac
-                    known_sr_case.status = status
-                    known_sr_case.contact = contact
-                    known_sr_case.contact_url = contact_url
+                # if known_sr_case was found, check for differences
+                # if known_sr_case was not found, then we assume a new one was added
+                # need to create
+                if known_sr_case:
+                    # Check for difference between known_sr_case and the variables
+                    # Assume that the sr_case number doesn't change.
+                    if (
+                        not fields_are_same(known_sr_case.case_url, case_url) or
+                        not fields_are_same(known_sr_case.project_name, project_name) or
+                        not fields_are_same(known_sr_case.cac, cac) or
+                        not fields_are_same(known_sr_case.status, status) or
+                        not fields_are_same(known_sr_case.contact, contact) or
+                        not fields_are_same(known_sr_case.contact_url, contact_url)
+                    ):
+                        known_sr_case.case_url = case_url
+                        known_sr_case.project_name = project_name
+                        known_sr_case.cac = cac
+                        known_sr_case.status = status
+                        known_sr_case.contact = contact
+                        known_sr_case.contact_url = contact_url
 
-                    known_sr_case.save()
+                        known_sr_case.save()
+                        logger.info("**********************")
+                        logger.info("Updating a site case (" + str(known_sr_case) + ")")
+                        logger.info("scrape case_number:" + case_number)
+                        logger.info("scrape project_name:" + project_name)
+                        logger.info("scrape cac: " + cac)
+                        logger.info("**********************")
+
+                else:
+                    # create a new instance
                     logger.info("**********************")
-                    logger.info("Updating a site case (" + str(known_sr_case) + ")")
-                    logger.info("scrape case_number:" + case_number)
-                    logger.info("scrape project_name:" + project_name)
-                    logger.info("scrape cac: " + cac)
+                    logger.info("Creating new site case")
+                    logger.info("case_number:" + case_number)
+                    logger.info("project_name:" + project_name)
+                    logger.info("cac: " + cac)
                     logger.info("**********************")
 
-            else:
-                # create a new instance
-                logger.info("**********************")
-                logger.info("Creating new site case")
-                logger.info("case_number:" + case_number)
-                logger.info("project_name:" + project_name)
-                logger.info("cac: " + cac)
-                logger.info("**********************")
-
-                SiteReviewCases.objects.create(case_number=case_number,
-                                               case_url=case_url,
-                                               project_name=project_name,
-                                               cac=cac,
-                                               status=status,
-                                               contact=contact,
-                                               contact_url=contact_url)
+                    SiteReviewCases.objects.create(case_number=case_number,
+                                                   case_url=case_url,
+                                                   project_name=project_name,
+                                                   cac=cac,
+                                                   status=status,
+                                                   contact=contact,
+                                                   contact_url=contact_url)
 
 
 def admin_alternates(page_content):
-    # Administrative Alternate Requests
-    aads_tables = page_content.find_all("table")
+    if page_content:
+        aads_tables = page_content.find_all("table")
 
-    for aads_table in aads_tables:
-        aads_rows = get_rows_in_table(aads_table, "AAD")
+        for aads_table in aads_tables:
+            aads_rows = get_rows_in_table(aads_table, "AAD")
 
-        # For each row, get the values then check if we already know about this item
-        # If we do not, then add it to the DB
-        # If we do, check for differences and update if
-        for aads_row in aads_rows:
-            row_tds = aads_row.find_all("td")
+            # For each row, get the values then check if we already know about this item
+            # If we do not, then add it to the DB
+            # If we do, check for differences and update if
+            for aads_row in aads_rows:
+                row_tds = aads_row.find_all("td")
 
-            case_number = get_case_number_from_row(row_tds)
-            case_url = get_generic_link(row_tds[0])
+                case_number = get_case_number_from_row(row_tds)
+                case_url = get_generic_link(row_tds[0])
 
-            project_name = row_tds[1].get_text().strip()
-            cac = row_tds[2].get_text().strip()
-            status = row_tds[3].get_text().strip()
-            contact = get_contact(row_tds[4])
-            contact_url = get_contact_url(row_tds[4])
+                project_name = row_tds[1].get_text().strip()
+                cac = row_tds[2].get_text().strip()
+                status = row_tds[3].get_text().strip()
+                contact = get_contact(row_tds[4])
+                contact_url = get_contact_url(row_tds[4])
 
-            # If any of these variables are None, log it and move on.
-            if not case_number or not case_url or not project_name or not cac or not status or not contact or not \
-                    contact_url:
-                scraped_info = [["row_tds", row_tds],
-                                ["case_number", case_number],
-                                ["case_url", case_url],
-                                ["project_name", project_name],
-                                ["cac", cac],
-                                ["status", status],
-                                ["contact", contact],
-                                ["contact_url", contact_url]]
-                message = "scrape.admin_alternates: Problem scraping this row"
-                message += scraped_info
-                logger.info(message)
-                send_email_notice(message, email_admins())
+                # If any of these variables are None, log it and move on.
+                if not case_number or not case_url or not project_name or not cac or not status or not contact or not \
+                        contact_url:
+                    scraped_info = [["row_tds", row_tds],
+                                    ["case_number", case_number],
+                                    ["case_url", case_url],
+                                    ["project_name", project_name],
+                                    ["cac", cac],
+                                    ["status", status],
+                                    ["contact", contact],
+                                    ["contact_url", contact_url]]
+                    message = "scrape.admin_alternates: Problem scraping this row"
+                    message += scraped_info
+                    logger.info(message)
+                    send_email_notice(message, email_admins())
 
-                continue
+                    continue
 
-            known_aad_cases = AdministrativeAlternates.objects.all()
-            known_aad_case = determine_if_known_case(known_aad_cases, case_number, project_name, cac)
+                known_aad_cases = AdministrativeAlternates.objects.all()
+                known_aad_case = determine_if_known_case(known_aad_cases, case_number, project_name, cac)
 
-            # if known_tc_case was found, check for differences
-            # if known_tc_case was not found, then we assume a new one was added
-            # need to create
-            if known_aad_case:
-                # Check for difference between known_tc_case and the variables
-                # Assume that the aad_case number doesn't change.
-                if (
-                    not fields_are_same(known_aad_case.case_url, case_url) or
-                    not fields_are_same(known_aad_case.project_name, project_name) or
-                    not fields_are_same(known_aad_case.cac, cac) or
-                    not fields_are_same(known_aad_case.status, status) or
-                    not fields_are_same(known_aad_case.contact, contact) or
-                    not fields_are_same(known_aad_case.contact_url, contact_url)
-                ):
-                    known_aad_case.case_url = case_url
-                    known_aad_case.project_name = project_name
-                    known_aad_case.cac = cac
-                    known_aad_case.status = status
-                    known_aad_case.contact = contact
-                    known_aad_case.contact_url = contact_url
+                # if known_tc_case was found, check for differences
+                # if known_tc_case was not found, then we assume a new one was added
+                # need to create
+                if known_aad_case:
+                    # Check for difference between known_tc_case and the variables
+                    # Assume that the aad_case number doesn't change.
+                    if (
+                        not fields_are_same(known_aad_case.case_url, case_url) or
+                        not fields_are_same(known_aad_case.project_name, project_name) or
+                        not fields_are_same(known_aad_case.cac, cac) or
+                        not fields_are_same(known_aad_case.status, status) or
+                        not fields_are_same(known_aad_case.contact, contact) or
+                        not fields_are_same(known_aad_case.contact_url, contact_url)
+                    ):
+                        known_aad_case.case_url = case_url
+                        known_aad_case.project_name = project_name
+                        known_aad_case.cac = cac
+                        known_aad_case.status = status
+                        known_aad_case.contact = contact
+                        known_aad_case.contact_url = contact_url
 
-                    known_aad_case.save()
+                        known_aad_case.save()
+                        logger.info("**********************")
+                        logger.info("Updating an AAD case (" + str(known_aad_case) + ")")
+                        logger.info("scrape case_number:" + case_number)
+                        logger.info("scrape project_name:" + project_name)
+                        logger.info("scrape cac: " + cac)
+                        logger.info("**********************")
+
+                else:
+                    # create a new instance
                     logger.info("**********************")
-                    logger.info("Updating an AAD case (" + str(known_aad_case) + ")")
-                    logger.info("scrape case_number:" + case_number)
-                    logger.info("scrape project_name:" + project_name)
-                    logger.info("scrape cac: " + cac)
+                    logger.info("Creating new site case")
+                    logger.info("case_number:" + case_number)
+                    logger.info("project_name:" + project_name)
+                    logger.info("cac: " + cac)
                     logger.info("**********************")
 
-            else:
-                # create a new instance
-                logger.info("**********************")
-                logger.info("Creating new site case")
-                logger.info("case_number:" + case_number)
-                logger.info("project_name:" + project_name)
-                logger.info("cac: " + cac)
-                logger.info("**********************")
-
-                AdministrativeAlternates.objects.create(case_number=case_number,
-                                                        case_url=case_url,
-                                                        project_name=project_name,
-                                                        cac=cac,
-                                                        status=status,
-                                                        contact=contact,
-                                                        contact_url=contact_url)
+                    AdministrativeAlternates.objects.create(case_number=case_number,
+                                                            case_url=case_url,
+                                                            project_name=project_name,
+                                                            cac=cac,
+                                                            status=status,
+                                                            contact=contact,
+                                                            contact_url=contact_url)
             
             
 def text_changes_cases(page_content):
-    # Text Change Cases
-    tc_tables = page_content.find_all("table")
+    if page_content:
+        tc_tables = page_content.find_all("table")
 
-    for tc_table in tc_tables:
-        tc_rows = get_rows_in_table(tc_table, "TCC")
+        for tc_table in tc_tables:
+            tc_rows = get_rows_in_table(tc_table, "TCC")
 
-        for tc in tc_rows:
-            row_tds = tc.find_all("td")
+            for tc in tc_rows:
+                row_tds = tc.find_all("td")
 
-            case_number = get_case_number_from_row(row_tds)
-            case_url = get_generic_link(row_tds[0])
+                case_number = get_case_number_from_row(row_tds)
+                case_url = get_generic_link(row_tds[0])
 
-            project_name = row_tds[1].get_text().strip()
-            status = row_tds[2].get_text().strip()
-            contact = get_contact(row_tds[3])
-            contact_url = get_contact_url(row_tds[3])
+                project_name = row_tds[1].get_text().strip()
+                status = row_tds[2].get_text().strip()
+                contact = get_contact(row_tds[3])
+                contact_url = get_contact_url(row_tds[3])
 
-            # Found a case where the TC name was not a link. We'll set it to something generic in the mean time.
-            if not case_url:
-                case_url = "NA"
+                # Found a case where the TC name was not a link. We'll set it to something generic in the mean time.
+                if not case_url:
+                    case_url = "NA"
 
-            # If any of these variables are None, log it and move on.
-            if not case_number or not case_url or not project_name or not status or not contact or not contact_url:
-                scraped_info = [["row_tds", row_tds],
-                                ["case_number", case_number],
-                                ["case_url", case_url],
-                                ["project_name", project_name],
-                                ["status", status],
-                                ["contact", contact],
-                                ["contact_url", contact_url]]
-                message = "scrape.text_changes_cases: Problem scraping this row"
-                message += scraped_info
-                logger.info(message)
-                send_email_notice(message, email_admins())
+                # If any of these variables are None, log it and move on.
+                if not case_number or not case_url or not project_name or not status or not contact or not contact_url:
+                    scraped_info = [["row_tds", row_tds],
+                                    ["case_number", case_number],
+                                    ["case_url", case_url],
+                                    ["project_name", project_name],
+                                    ["status", status],
+                                    ["contact", contact],
+                                    ["contact_url", contact_url]]
+                    message = "scrape.text_changes_cases: Problem scraping this row"
+                    message += scraped_info
+                    logger.info(message)
+                    send_email_notice(message, email_admins())
 
-                continue
+                    continue
 
-            known_tc_cases = TextChangeCases.objects.all()
-            known_tc_case = determine_if_known_case(known_tc_cases, case_number, project_name, cac=None)
+                known_tc_cases = TextChangeCases.objects.all()
+                known_tc_case = determine_if_known_case(known_tc_cases, case_number, project_name, cac=None)
 
-            # if known_tc_case was found, check for differences
-            # if known_tc_case was not found, then we assume a new one was added
-            # need to create
-            if known_tc_case:
-                # Check for difference between known_tc_case and the variables
-                # Assume that the tc_case number doesn't change.
-                if (
-                    not fields_are_same(known_tc_case.case_url, case_url) or
-                    not fields_are_same(known_tc_case.project_name, project_name) or
-                    not fields_are_same(known_tc_case.status, status) or
-                    not fields_are_same(known_tc_case.contact, contact) or
-                    not fields_are_same(known_tc_case.contact_url, contact_url)
-                ):
-                    known_tc_case.case_url = case_url
-                    known_tc_case.project_name = project_name
-                    known_tc_case.status = status
-                    known_tc_case.contact = contact
-                    known_tc_case.contact_url = contact_url
+                # if known_tc_case was found, check for differences
+                # if known_tc_case was not found, then we assume a new one was added
+                # need to create
+                if known_tc_case:
+                    # Check for difference between known_tc_case and the variables
+                    # Assume that the tc_case number doesn't change.
+                    if (
+                        not fields_are_same(known_tc_case.case_url, case_url) or
+                        not fields_are_same(known_tc_case.project_name, project_name) or
+                        not fields_are_same(known_tc_case.status, status) or
+                        not fields_are_same(known_tc_case.contact, contact) or
+                        not fields_are_same(known_tc_case.contact_url, contact_url)
+                    ):
+                        known_tc_case.case_url = case_url
+                        known_tc_case.project_name = project_name
+                        known_tc_case.status = status
+                        known_tc_case.contact = contact
+                        known_tc_case.contact_url = contact_url
 
-                    known_tc_case.save()
+                        known_tc_case.save()
+                        logger.info("**********************")
+                        logger.info("Updating a text change case (" + str(known_tc_case) + ")")
+                        logger.info("scrape case_number:" + case_number)
+                        logger.info("scrape project_name:" + project_name)
+                        logger.info("**********************")
+
+                else:
+                    # create a new instance
                     logger.info("**********************")
-                    logger.info("Updating a text change case (" + str(known_tc_case) + ")")
-                    logger.info("scrape case_number:" + case_number)
-                    logger.info("scrape project_name:" + project_name)
+                    logger.info("Creating new site case")
+                    logger.info("case_number:" + case_number)
+                    logger.info("project_name:" + project_name)
                     logger.info("**********************")
 
-            else:
-                # create a new instance
-                logger.info("**********************")
-                logger.info("Creating new site case")
-                logger.info("case_number:" + case_number)
-                logger.info("project_name:" + project_name)
-                logger.info("**********************")
-
-                TextChangeCases.objects.create(case_number=case_number,
-                                               case_url=case_url,
-                                               project_name=project_name,
-                                               status=status,
-                                               contact=contact,
-                                               contact_url=contact_url)
+                    TextChangeCases.objects.create(case_number=case_number,
+                                                   case_url=case_url,
+                                                   project_name=project_name,
+                                                   status=status,
+                                                   contact=contact,
+                                                   contact_url=contact_url)
 
 
 def zoning_requests(page_content):
-    # Zoning Requests
-    zoning_tables = page_content.find_all("table")
+    if page_content:
+        zoning_tables = page_content.find_all("table")
 
-    for zoning_table in zoning_tables:
-        zoning_rows = get_rows_in_table(zoning_table, "Zoning")
+        for zoning_table in zoning_tables:
+            zoning_rows = get_rows_in_table(zoning_table, "Zoning")
 
-        for i in range(0, len(zoning_rows), 2):
-            # First row is zoning_rows[i]
-            # Second row is zoning_rows[i+1]
-            info_row_tds = zoning_rows[i].find_all("td")
-            status_row_tds = zoning_rows[i + 1].find_all("td")
+            for i in range(0, len(zoning_rows), 2):
+                # First row is zoning_rows[i]
+                # Second row is zoning_rows[i+1]
+                info_row_tds = zoning_rows[i].find_all("td")
+                status_row_tds = zoning_rows[i + 1].find_all("td")
 
-            # This gets the zoning case label.
-            # Some cases have a master plan case so label ends up like "Z-14-19MP-1-19"
-            case_number = info_row_tds[0].get_text().split("\n")[0]
-            if "mp" in case_number.lower():
-                case_number = case_number.lower().split("mp")[0]
+                # This gets the zoning case label.
+                # Some cases have a master plan case so label ends up like "Z-14-19MP-1-19"
+                case_number = info_row_tds[0].get_text().split("\n")[0]
+                if "mp" in case_number.lower():
+                    case_number = case_number.lower().split("mp")[0]
 
-            location = info_row_tds[1].get_text()
-            location_url = get_generic_link(info_row_tds[1])
-            # cac = info_row_tds[2].get_text() Now changed to council district which we don't want
-            contact = get_contact(info_row_tds[3])
-            status = status_row_tds[0].get_text()
+                location = info_row_tds[1].get_text()
+                location_url = get_generic_link(info_row_tds[1])
+                # cac = info_row_tds[2].get_text() Now changed to council district which we don't want
+                contact = get_contact(info_row_tds[3])
+                status = status_row_tds[0].get_text()
 
-            zoning_case = case_number.split("\n")[0]
-            plan_url = get_generic_link(info_row_tds[0])
+                zoning_case = case_number.split("\n")[0]
+                plan_url = get_generic_link(info_row_tds[0])
 
-            # Break up zoning_case
-            scrape_num = zoning_case.split("-")[1]
-            scrape_year = "20" + zoning_case.split("-")[2][:2]
+                # Break up zoning_case
+                scrape_num = zoning_case.split("-")[1]
+                scrape_year = "20" + zoning_case.split("-")[2][:2]
 
-            # If any of these variables are None, log it and move on.
-            # Remarks come from the API
-            # Status is from the web scrape
-            if not case_number or not location or not zoning_case or not status:
-                scraped_info = [["info_row_tds", info_row_tds],
-                                ["status_row_tds", status_row_tds],
-                                ["case_number", case_number],
-                                ["location", location],
-                                ["location_url", location_url],
-                                ["contact", contact],
-                                ["status", status],
-                                ["plan_url", plan_url]]
-                message = "scrape.zoning_requests: Problem scraping this row"
-                message += scraped_info
-                logger.info(message)
-                send_email_notice(message, email_admins())
+                # If any of these variables are None, log it and move on.
+                # Remarks come from the API
+                # Status is from the web scrape
+                if not case_number or not location or not zoning_case or not status:
+                    scraped_info = [["info_row_tds", info_row_tds],
+                                    ["status_row_tds", status_row_tds],
+                                    ["case_number", case_number],
+                                    ["location", location],
+                                    ["location_url", location_url],
+                                    ["contact", contact],
+                                    ["status", status],
+                                    ["plan_url", plan_url]]
+                    message = "scrape.zoning_requests: Problem scraping this row"
+                    message += scraped_info
+                    logger.info(message)
+                    send_email_notice(message, email_admins())
 
-                continue
+                    continue
 
-            # First check if we already have this zoning request
-            if Zoning.objects.filter(zpnum=int(scrape_num), zpyear=int(scrape_year)).exists():
-                known_zon = Zoning.objects.get(zpyear=scrape_year, zpnum=scrape_num)
+                # First check if we already have this zoning request
+                if Zoning.objects.filter(zpnum=int(scrape_num), zpyear=int(scrape_year)).exists():
+                    known_zon = Zoning.objects.get(zpyear=scrape_year, zpnum=scrape_num)
 
-                # If the status, plan_url, or location_url have changed, update the zoning request
-                if (not fields_are_same(known_zon.status, status) or
-                        not fields_are_same(known_zon.plan_url, plan_url) or
-                        not fields_are_same(known_zon.location_url, location_url)):
-                    # A zoning web scrape only updates status and/or plan_url and/or location_url
-                    known_zon.status = status
-                    known_zon.plan_url = plan_url
-                    known_zon.location_url = location_url
+                    # If the status, plan_url, or location_url have changed, update the zoning request
+                    if (not fields_are_same(known_zon.status, status) or
+                            not fields_are_same(known_zon.plan_url, plan_url) or
+                            not fields_are_same(known_zon.location_url, location_url)):
+                        # A zoning web scrape only updates status and/or plan_url and/or location_url
+                        known_zon.status = status
+                        known_zon.plan_url = plan_url
+                        known_zon.location_url = location_url
 
-                    known_zon.save()
+                        known_zon.save()
 
-                    # Want to log what the difference is
-                    difference = "*"
-                    if not fields_are_same(known_zon.status, status):
-                        difference += "Difference: " + str(known_zon.status) + " changed to " + str(status)
-                    if not fields_are_same(known_zon.plan_url, plan_url):
-                        difference += "Difference: " + str(known_zon.plan_url) + " changed to " + str(plan_url)
-                    if not fields_are_same(known_zon.location_url, location_url):
-                        difference += "Difference: " + str(known_zon.location_url) + " changed to " + str(location_url)
+                        # Want to log what the difference is
+                        difference = "*"
+                        if not fields_are_same(known_zon.status, status):
+                            difference += "Difference: " + str(known_zon.status) + " changed to " + str(status)
+                        if not fields_are_same(known_zon.plan_url, plan_url):
+                            difference += "Difference: " + str(known_zon.plan_url) + " changed to " + str(plan_url)
+                        if not fields_are_same(known_zon.location_url, location_url):
+                            difference += "Difference: " + str(known_zon.location_url) + " changed to " + str(location_url)
 
+                        logger.info("**********************")
+                        logger.info("Updating a zoning request")
+                        logger.info("known_zon: " + str(known_zon))
+                        logger.info(difference)
+                        logger.info("**********************")
+
+                else:
+                    # We don't know about it so create a new zoning request
                     logger.info("**********************")
-                    logger.info("Updating a zoning request")
-                    logger.info("known_zon: " + str(known_zon))
-                    logger.info(difference)
+                    logger.info("Creating new Zoning Request from web scrape")
+                    logger.info("case_number:" + zoning_case)
+                    logger.info("location: " + location)
                     logger.info("**********************")
 
-            else:
-                # We don't know about it so create a new zoning request
-                logger.info("**********************")
-                logger.info("Creating new Zoning Request from web scrape")
-                logger.info("case_number:" + zoning_case)
-                logger.info("location: " + location)
-                logger.info("**********************")
-
-                Zoning.objects.create(zpyear=scrape_year,
-                                      zpnum=scrape_num,
-                                      status=status,
-                                      location=location,
-                                      received_by=contact,
-                                      plan_url=plan_url,
-                                      location_url=location_url)
+                    Zoning.objects.create(zpyear=scrape_year,
+                                          zpnum=scrape_num,
+                                          status=status,
+                                          location=location,
+                                          received_by=contact,
+                                          plan_url=plan_url,
+                                          location_url=location_url)
