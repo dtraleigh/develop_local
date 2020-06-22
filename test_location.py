@@ -32,6 +32,9 @@ class LocationSimpleTestCase(SimpleTestCase):
         pin1 = "1703738654"
         self.assertEqual(get_lat_lon_by_pin(pin1), (35.76526123905713, -78.6364477714054))
 
+        pin2 = "1703481885"
+        self.assertEqual(get_lat_lon_by_pin(pin2), (35.779616373601435, -78.648778649107086))
+
 
 class LocationTestCase(TestCase):
     @classmethod
@@ -159,7 +162,7 @@ class LocationTestCase(TestCase):
 
         # what if none?
         none_place = is_itb(None, None)
-        self.assertEqual(weird_place, False)
+        self.assertEqual(none_place, False)
 
     def test_calculate_cac(self):
         url1 = "https://maps.raleighnc.gov/iMAPS/?pin=0772865947"
@@ -204,3 +207,4 @@ class LocationTestCase(TestCase):
 
         url7 = None
         self.assertEqual(get_pins_from_location_url(url7), None)
+
