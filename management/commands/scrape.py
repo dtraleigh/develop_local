@@ -85,11 +85,15 @@ def get_contact(content):
 
 def get_generic_link(content):
     # This is used to grab the hyperlink out of a snippet of code
-    # This assumes the entire link is in there vs a relative link.
     if len(content.find_all("a")) == 0:
         return None
     elif len(content.find_all("a")) == 1:
-        return content.find("a")["href"].strip().replace(" ", "%20")
+        url = content.find("a")["href"].strip().replace(" ", "%20")
+
+        # Some urls are relative so let's complete them
+        if url[0] == "/":
+            return "https://raleighnc.gov" + url
+        return url
     else:
         return None
 
