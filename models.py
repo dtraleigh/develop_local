@@ -123,7 +123,7 @@ class DevelopmentPlan(models.Model):
     engineer_p = models.CharField(max_length=10, blank=True, null=True)
     developer = models.CharField(max_length=48, blank=True, null=True)
     developer_field = models.CharField(max_length=13, blank=True, null=True)
-    plan_name = models.CharField(max_length=44, blank=True, null=True)
+    plan_name = models.CharField(max_length=100, blank=True, null=True)
     planurl = models.CharField(max_length=107, blank=True, null=True)
     planurl_ap = models.CharField(max_length=1, blank=True, null=True)
     planner = models.CharField(max_length=30, blank=True, null=True)

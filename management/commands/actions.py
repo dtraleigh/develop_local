@@ -126,8 +126,8 @@ def api_object_is_different(known_object, item_json):
                             str(getattr(known_object, field)) +
                             " (" + str(type(getattr(known_object, field))) + ")" +
                             ",  item_json[" + field + "]: " +
-                            str(item_json[field]) +
-                            " (" + str(type(item_json[field])) + ")"
+                            str(item_json[DevelopmentPlan.developmentplan_mapping[field]]) +
+                            " (" + str(type(item_json[DevelopmentPlan.developmentplan_mapping[field]])) + ")"
                             )
                 logger.info("\n")
                 logger.info("known_object------------->")
