@@ -198,7 +198,7 @@ def get_lat_lon_by_pin(pin):
             return coordinates["y"], coordinates["x"]
         except IndexError:
             message = "IndexError in location.get_lat_lon_by_pin()\n"
-            message += response.json()
+            message += str(response.text.encode('utf8'))
             send_email_notice(message, email_admins())
             return None, None
     return None, None
