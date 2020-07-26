@@ -56,12 +56,10 @@ class Command(BaseCommand):
                 pass
             else:
                 message = "SR Table has changed.\n"
-                x.add_row(sr_actual)
-                x.add_row(sr_expected)
                 message += str(x)
 
         # AAD tables
-        aad_expected = ['Case Number', 'Project Name/Location/Description', 'CAC', 'Status*', 'Contact']
+        aad_expected = ['Case Number', 'Project Name/Location/Description', 'Status*', 'Contact']
         aad_tables = get_page_content(aad_page_link).find_all("table")
         for aad_table in aad_tables:
             x = PrettyTable()
@@ -76,8 +74,6 @@ class Command(BaseCommand):
                 pass
             else:
                 message = "AAD Table has changed.\n"
-                x.add_row(aad_actual)
-                x.add_row(aad_expected)
                 message += str(x)
 
         # TCC tables
@@ -97,9 +93,6 @@ class Command(BaseCommand):
                 pass
             else:
                 message = "TCC Table has changed.\n"
-                x.add_row(tcc_actual)
-                x.add_row(tcc_expected1)
-                x.add_row(tcc_expected2)
                 message += str(x)
 
         # Zoning tables
@@ -119,8 +112,6 @@ class Command(BaseCommand):
                 pass
             else:
                 message = "Zon Table has changed.\n"
-                x.add_row(zon_actual)
-                x.add_row(zon_expected)
                 message += str(x)
 
         if message:

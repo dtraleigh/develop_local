@@ -30,7 +30,7 @@ class Command(BaseCommand):
             tc_page_link = "https://raleighnc.gov/SupportPages/text-change-cases"
 
             zoning_requests(get_page_content(zon_page_link))
-            admin_alternates(get_page_content(aad_page_link))
+            # admin_alternates(get_page_content(aad_page_link))
             text_changes_cases(get_page_content(tc_page_link))
             site_reviews(get_page_content(sr_page_link))
 

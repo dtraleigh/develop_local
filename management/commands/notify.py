@@ -31,9 +31,10 @@ def get_everything_that_changed():
                                                                             timezone.now()])
     zons_that_changed = Zoning.objects.filter(modified_date__range=[timezone.now() - timedelta(hours=1),
                                                                     timezone.now()])
-    AADs_that_changed = AdministrativeAlternates.objects.filter(modified_date__range=[timezone.now() -
-                                                                                      timedelta(hours=1),
-                                                                                      timezone.now()])
+    # AADs_that_changed = AdministrativeAlternates.objects.filter(modified_date__range=[timezone.now() -
+    #                                                                                   timedelta(hours=1),
+    #                                                                                   timezone.now()])
+    AADs_that_changed = []
     TCs_that_changed = TextChangeCases.objects.filter(modified_date__range=[timezone.now() -
                                                                             timedelta(hours=1),
                                                                             timezone.now()])
