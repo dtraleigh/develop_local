@@ -165,10 +165,10 @@ class LocationTestCase(TestCase):
         self.assertEqual(none_place, False)
 
     def test_calculate_cac(self):
-        url1 = "https://maps.raleighnc.gov/iMAPS/?pin=0772865947"
+        url1 = "https://maps.raleighnc.gov/iMAPS/?pin=0772874525"
         self.assertEqual(calculate_cac(url1), "West")
 
-        url2 = "https://maps.raleighnc.gov/iMAPS/?pin=0772865947,0772875055,0772875125,0772873120"
+        url2 = "https://maps.raleighnc.gov/iMAPS/?pin=0772874525,0772875055,0772875125,0772873120"
         self.assertEqual(calculate_cac(url2), "West")
 
         url3 = "https://maps.raleighnc.gov/iMAPS/?pin=1703569731"
@@ -208,3 +208,21 @@ class LocationTestCase(TestCase):
         url7 = None
         self.assertEqual(get_pins_from_location_url(url7), None)
 
+    def test_get_cac_from_plan_name(self):
+        text1 = "Camelot Village III / 4200 Pearl Road"
+        self.assertEqual(get_cac_from_plan_name(text1), "South")
+
+        text2 = "1641 Glenwood Ave. / Fifth Third Bank"
+        self.assertEqual(get_cac_from_plan_name(text2), "Five Points")
+
+        text3 = "214 Buck Jones Road"
+        self.assertEqual(get_cac_from_plan_name(text3), "West")
+
+        text4 = "Huge Development / 214 Buck Jones Road / 1641 Glenwood Ave."
+        self.assertEqual(get_cac_from_plan_name(text4), "West")
+
+        text5 = ""
+        self.assertEqual(get_cac_from_plan_name(text5), None)
+
+        text6 = None
+        self.assertEqual(get_cac_from_plan_name(text6), None)

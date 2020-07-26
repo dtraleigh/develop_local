@@ -58,17 +58,19 @@ def get_subscribers_covered_changed_items(items_that_changed, covered_CACs_total
 
 
 def get_itb_items(items_that_changed):
-    # For zoning requests, we want only the ones that are itb
     tracked_items = []
 
     for item in items_that_changed:
+        # For zoning requests, we want only the ones that are itb
         if isinstance(item, Zoning):
             lat, lon = get_lat_lon_by_pin(get_pins_from_location_url(item.location_url)[0])
             if is_itb(lat, lon):
                 tracked_items.append(item)
+        # Dev plans, we can calculate is_itb using geom x and y
         elif isinstance(item, DevelopmentPlan):
             if is_itb(item.geom.y, item.geom.x):
                 tracked_items.append(item)
+        # Text change cases aren't always location specific so just add all of them
         elif isinstance(item, TextChangeCases):
             tracked_items.append(item)
         # This doesn't enforce the cac_override principle but this works
@@ -99,7 +101,7 @@ def cac_lookup(address):
     locator = Nominatim(user_agent="myGeocoder")
 
     if address:
-        address = clean_address(address)  # this will append "Raleigh NC USA"
+        address = clean_address(address)  # this will append " raleigh NC USA"
         try:
             location = locator.geocode(address)
         except geopy.exc.GeocoderTimedOut:
@@ -253,3 +255,21 @@ def calculate_cac(location_url):
         message += location_url
         send_email_notice(message, email_admins())
         return None
+
+
+def get_cac_from_plan_name(scraped_text):
+    # For AADs, we need to try and get an address out of something like
+    # "Camelot Village III / 4200 Pearl Road"
+    if scraped_text:
+        text_parts = scraped_text.split("/")
+    else:
+        return None
+
+    for part in text_parts:
+        cac = cac_lookup(part)
+
+        # Let's just take the first valid hit
+        if cac:
+            return cac
+
+    return None

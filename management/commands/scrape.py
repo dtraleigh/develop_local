@@ -30,7 +30,7 @@ class Command(BaseCommand):
             tc_page_link = "https://raleighnc.gov/SupportPages/text-change-cases"
 
             zoning_requests(get_page_content(zon_page_link))
-            # admin_alternates(get_page_content(aad_page_link))
+            admin_alternates(get_page_content(aad_page_link))
             text_changes_cases(get_page_content(tc_page_link))
             site_reviews(get_page_content(sr_page_link))
 
@@ -118,7 +118,7 @@ def determine_if_known_case(known_cases, case_number, project_name, cac):
         case_number_score = fuzz.ratio(case_number.lower(), case.case_number.lower())
         project_name_score = fuzz.ratio(project_name.lower(), case.project_name.lower())
 
-        # TCs don't use CAC
+        # TCs and AADs don't use CAC
         if cac:
             cac_score = fuzz.ratio(cac.lower(), case.cac.lower())
         else:
@@ -244,19 +244,17 @@ def admin_alternates(page_content):
                 case_url = get_generic_link(row_tds[0])
 
                 project_name = row_tds[1].get_text().strip()
-                cac = row_tds[2].get_text().strip()
-                status = row_tds[3].get_text().strip()
-                contact = get_contact(row_tds[4])
-                contact_url = get_contact_url(row_tds[4])
+                status = row_tds[2].get_text().strip()
+                contact = row_tds[3].find("a").get_text().strip()
+                contact_url = get_contact_url(row_tds[3])
 
                 # If any of these variables are None, log it and move on.
-                if not case_number or not case_url or not project_name or not cac or not status or not contact or not \
+                if not case_number or not case_url or not project_name or not status or not contact or not \
                         contact_url:
                     scraped_info = [["row_tds", row_tds],
                                     ["case_number", case_number],
                                     ["case_url", case_url],
                                     ["project_name", project_name],
-                                    ["cac", cac],
                                     ["status", status],
                                     ["contact", contact],
                                     ["contact_url", contact_url]]
@@ -268,7 +266,7 @@ def admin_alternates(page_content):
                     continue
 
                 known_aad_cases = AdministrativeAlternates.objects.all()
-                known_aad_case = determine_if_known_case(known_aad_cases, case_number, project_name, cac)
+                known_aad_case = determine_if_known_case(known_aad_cases, case_number, project_name, cac=None)
 
                 # if known_tc_case was found, check for differences
                 # if known_tc_case was not found, then we assume a new one was added
@@ -279,14 +277,12 @@ def admin_alternates(page_content):
                     if (
                         not fields_are_same(known_aad_case.case_url, case_url) or
                         not fields_are_same(known_aad_case.project_name, project_name) or
-                        not fields_are_same(known_aad_case.cac, cac) or
                         not fields_are_same(known_aad_case.status, status) or
                         not fields_are_same(known_aad_case.contact, contact) or
                         not fields_are_same(known_aad_case.contact_url, contact_url)
                     ):
                         known_aad_case.case_url = case_url
                         known_aad_case.project_name = project_name
-                        known_aad_case.cac = cac
                         known_aad_case.status = status
                         known_aad_case.contact = contact
                         known_aad_case.contact_url = contact_url
@@ -296,7 +292,6 @@ def admin_alternates(page_content):
                         logger.info("Updating an AAD case (" + str(known_aad_case) + ")")
                         logger.info("scrape case_number:" + case_number)
                         logger.info("scrape project_name:" + project_name)
-                        logger.info("scrape cac: " + cac)
                         logger.info("**********************")
 
                 else:
@@ -305,13 +300,12 @@ def admin_alternates(page_content):
                     logger.info("Creating new site case")
                     logger.info("case_number:" + case_number)
                     logger.info("project_name:" + project_name)
-                    logger.info("cac: " + cac)
                     logger.info("**********************")
 
                     AdministrativeAlternates.objects.create(case_number=case_number,
                                                             case_url=case_url,
                                                             project_name=project_name,
-                                                            cac=cac,
+                                                            cac=get_cac_from_plan_name(project_name),
                                                             status=status,
                                                             contact=contact,
                                                             contact_url=contact_url)
