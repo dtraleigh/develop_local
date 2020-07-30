@@ -196,8 +196,11 @@ def get_lat_lon_by_pin(pin):
 
     if response.status_code == 200:
         try:
-            coordinates = response.json()["features"][0]["geometry"]
-            return coordinates["y"], coordinates["x"]
+            if response.json()["features"]:
+                coordinates = response.json()["features"][0]["geometry"]
+                return coordinates["y"], coordinates["x"]
+            else:
+                return None, None
         except IndexError:
             message = "IndexError in location.get_lat_lon_by_pin()\n"
             message += str(response.text.encode('utf8'))
