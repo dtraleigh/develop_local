@@ -161,18 +161,20 @@ def site_reviews(page_content):
 
                 # If any of these variables are None, log it and move on.
                 if not case_number or not case_url or not project_name or not cac or not status or not contact:
-                    scraped_info = [["row_tds", row_tds],
-                                    ["case_number", case_number],
-                                    ["case_url", case_url],
-                                    ["project_name", project_name],
-                                    ["cac", cac],
-                                    ["status", status],
-                                    ["contact", contact],
-                                    ["contact_url", contact_url]]
-                    message = "scrape.site_reviews: Problem scraping this row"
-                    message += scraped_info
-                    logger.info(message)
-                    send_email_notice(message, email_admins())
+                    # A quick hack until the city fixes this one.
+                    if case_number != "ASR-0054-2020":
+                        scraped_info = [["row_tds", row_tds],
+                                        ["case_number", case_number],
+                                        ["case_url", case_url],
+                                        ["project_name", project_name],
+                                        ["cac", cac],
+                                        ["status", status],
+                                        ["contact", contact],
+                                        ["contact_url", contact_url]]
+                        message = "scrape.site_reviews: Problem scraping this row"
+                        message += str(scraped_info)
+                        logger.info(message)
+                        send_email_notice(message, email_admins())
 
                     # Reminder: continue will move this to the next loop iteration.
                     continue

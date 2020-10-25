@@ -56,6 +56,8 @@ class Command(BaseCommand):
                 pass
             else:
                 message = "SR Table has changed.\n"
+                x.add_row(sr_actual)
+                x.add_row(sr_expected)
                 message += str(x)
 
         # AAD tables
@@ -74,6 +76,8 @@ class Command(BaseCommand):
                 pass
             else:
                 message = "AAD Table has changed.\n"
+                x.add_row(aad_actual)
+                x.add_row(aad_expected)
                 message += str(x)
 
         # TCC tables
@@ -93,11 +97,13 @@ class Command(BaseCommand):
                 pass
             else:
                 message = "TCC Table has changed.\n"
+                x.add_row(tcc_actual)
+                x.add_row(tcc_expected1)
+                x.add_row(tcc_expected2)
                 message += str(x)
 
         # Zoning tables
-        zon_expected = ['Case NumberMaster Plan Number			(Date uploaded)', 'Location/Status',
-                        'Council District', 'Contact']
+        zon_expected = ['Case Number', 'Project Name/Location/Description', 'CAC', 'Contact']
         zon_tables = get_page_content(zon_page_link).find_all("table")
         for zon_table in zon_tables:
             x = PrettyTable()
@@ -111,6 +117,8 @@ class Command(BaseCommand):
             if zon_actual == zon_expected:
                 pass
             else:
+                x.add_row(zon_actual)
+                x.add_row(zon_expected)
                 message = "Zon Table has changed.\n"
                 message += str(x)
 
