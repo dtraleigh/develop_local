@@ -41,7 +41,7 @@ class Command(BaseCommand):
         # scrape the target websites and verify that the table headers are what we expect.
 
         # Site Review tables
-        sr_expected = ['Case Number', 'Project Name/Location/Description', 'CAC', 'Status*', 'Contact']
+        sr_expected = ["Case Number", "Project Name/Location/Description", "CAC", "Status*", "Contact"]
         sr_tables = get_page_content(sr_page_link).find_all("table")
         for sr_table in sr_tables:
             x = PrettyTable()
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 message += str(x)
 
         # AAD tables
-        aad_expected = ['Case Number', 'Project Name/Location/Description', 'Status*', 'Contact']
+        aad_expected = ["Case Number", "Project Name/Location/Description", "Status*", "Contact"]
         aad_tables = get_page_content(aad_page_link).find_all("table")
         for aad_table in aad_tables:
             x = PrettyTable()
@@ -81,8 +81,8 @@ class Command(BaseCommand):
                 message += str(x)
 
         # TCC tables
-        tcc_expected1 = ['Case Number', 'Project Name/Location/Description', 'Status*', 'Contact']
-        tcc_expected2 = ['Case Number', 'Project Name/Location/Description', 'Status', 'Contact']
+        tcc_expected1 = ["Case Number", "Project Name/Location/Description", "Status*", "Contact"]
+        tcc_expected2 = ["Case Number", "Project Name/Location/Description", "Status", "Contact"]
         tcc_tables = get_page_content(tc_page_link).find_all("table")
         for tcc_table in tcc_tables:
             x = PrettyTable()
@@ -103,7 +103,7 @@ class Command(BaseCommand):
                 message += str(x)
 
         # Zoning tables
-        zon_expected = ['Case Number', 'Project Name/Location/Description', 'CAC', 'Contact']
+        zon_expected = ["Case Number", "Project Name/Location/Description", "Council District", "Contact"]
         zon_tables = get_page_content(zon_page_link).find_all("table")
         for zon_table in zon_tables:
             x = PrettyTable()
@@ -112,7 +112,7 @@ class Command(BaseCommand):
             thead_row = table_thead.find_all("td")
 
             for header in thead_row:
-                zon_actual.append(header.get_text().strip().replace('\n', ''))
+                zon_actual.append(header.get_text().strip().replace("\n", ""))
 
             if zon_actual == zon_expected:
                 pass
