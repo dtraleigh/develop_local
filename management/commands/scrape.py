@@ -317,7 +317,8 @@ def text_changes_cases(page_content):
     if page_content:
         tc_tables = page_content.find_all("table")
 
-        for tc_table in tc_tables:
+        # Skip the last table on this page.
+        for tc_table in tc_tables[:-1]:
             tc_rows = get_rows_in_table(tc_table, "TCC")
 
             for tc in tc_rows:
@@ -345,7 +346,7 @@ def text_changes_cases(page_content):
                                     ["contact", contact],
                                     ["contact_url", contact_url]]
                     message = "scrape.text_changes_cases: Problem scraping this row"
-                    message += scraped_info
+                    message += str(scraped_info)
                     logger.info(message)
                     send_email_notice(message, email_admins())
 

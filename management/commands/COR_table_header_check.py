@@ -93,14 +93,15 @@ class Command(BaseCommand):
             for header in thead_row:
                 tcc_actual.append(header.get_text().strip())
 
-            if tcc_actual == tcc_expected1 or tcc_actual == tcc_expected2:
-                pass
-            else:
-                message = "TCC Table has changed.\n"
-                x.add_row(tcc_actual)
-                x.add_row(tcc_expected1)
-                x.add_row(tcc_expected2)
-                message += str(x)
+            if len(tcc_actual) > 0:
+                if tcc_actual == tcc_expected1 or tcc_actual == tcc_expected2:
+                    pass
+                else:
+                    message = "TCC Table has changed.\n"
+                    x.add_row(tcc_actual)
+                    x.add_row(tcc_expected1)
+                    x.add_row(tcc_expected2)
+                    message += str(x)
 
         # Zoning tables
         zon_expected = ["Case Number", "Project Name/Location/Description", "Council District", "Contact"]
