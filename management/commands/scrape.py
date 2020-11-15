@@ -317,84 +317,93 @@ def text_changes_cases(page_content):
     if page_content:
         tc_tables = page_content.find_all("table")
 
-        # Skip the last table on this page.
-        for tc_table in tc_tables[:-1]:
-            tc_rows = get_rows_in_table(tc_table, "TCC")
+        for tc_table in tc_tables:
+            # Only check the tables that have thead and td header
+            # For some reason, this new table that we should skip has th header tags instead
+            tcc_actual = []
+            table_thead = tc_table.find("thead")
+            thead_row = table_thead.find_all("td")
 
-            for tc in tc_rows:
-                row_tds = tc.find_all("td")
+            for header in thead_row:
+                tcc_actual.append(header.get_text().strip())
 
-                case_number = get_case_number_from_row(row_tds)
-                case_url = get_generic_link(row_tds[0])
+            if len(tcc_actual) > 0:
+                tc_rows = get_rows_in_table(tc_table, "TCC")
 
-                project_name = row_tds[1].get_text().strip()
-                status = row_tds[2].get_text().strip()
-                contact = get_contact(row_tds[3])
-                contact_url = get_contact_url(row_tds[3])
+                for tc in tc_rows:
+                    row_tds = tc.find_all("td")
 
-                # Found a case where the TC name was not a link. We'll set it to something generic in the mean time.
-                if not case_url:
-                    case_url = "NA"
+                    case_number = get_case_number_from_row(row_tds)
+                    case_url = get_generic_link(row_tds[0])
 
-                # If any of these variables are None, log it and move on.
-                if not case_number or not case_url or not project_name or not status or not contact or not contact_url:
-                    scraped_info = [["row_tds", row_tds],
-                                    ["case_number", case_number],
-                                    ["case_url", case_url],
-                                    ["project_name", project_name],
-                                    ["status", status],
-                                    ["contact", contact],
-                                    ["contact_url", contact_url]]
-                    message = "scrape.text_changes_cases: Problem scraping this row"
-                    message += str(scraped_info)
-                    logger.info(message)
-                    send_email_notice(message, email_admins())
+                    project_name = row_tds[1].get_text().strip()
+                    status = row_tds[2].get_text().strip()
+                    contact = get_contact(row_tds[3])
+                    contact_url = get_contact_url(row_tds[3])
 
-                    continue
+                    # Found a case where the TC name was not a link. We'll set it to something generic in the mean time.
+                    if not case_url:
+                        case_url = "NA"
 
-                known_tc_cases = TextChangeCases.objects.all()
-                known_tc_case = determine_if_known_case(known_tc_cases, case_number, project_name, cac=None)
+                    # If any of these variables are None, log it and move on.
+                    if not case_number or not case_url or not project_name or not status or not contact or not contact_url:
+                        scraped_info = [["row_tds", row_tds],
+                                        ["case_number", case_number],
+                                        ["case_url", case_url],
+                                        ["project_name", project_name],
+                                        ["status", status],
+                                        ["contact", contact],
+                                        ["contact_url", contact_url]]
+                        message = "scrape.text_changes_cases: Problem scraping this row"
+                        message += str(scraped_info)
+                        logger.info(message)
+                        # send_email_notice(message, email_admins())
 
-                # if known_tc_case was found, check for differences
-                # if known_tc_case was not found, then we assume a new one was added
-                # need to create
-                if known_tc_case:
-                    # Check for difference between known_tc_case and the variables
-                    # Assume that the tc_case number doesn't change.
-                    if (
-                        not fields_are_same(known_tc_case.case_url, case_url) or
-                        not fields_are_same(known_tc_case.project_name, project_name) or
-                        not fields_are_same(known_tc_case.status, status) or
-                        not fields_are_same(known_tc_case.contact, contact) or
-                        not fields_are_same(known_tc_case.contact_url, contact_url)
-                    ):
-                        known_tc_case.case_url = case_url
-                        known_tc_case.project_name = project_name
-                        known_tc_case.status = status
-                        known_tc_case.contact = contact
-                        known_tc_case.contact_url = contact_url
+                        continue
 
-                        known_tc_case.save()
+                    known_tc_cases = TextChangeCases.objects.all()
+                    known_tc_case = determine_if_known_case(known_tc_cases, case_number, project_name, cac=None)
+
+                    # if known_tc_case was found, check for differences
+                    # if known_tc_case was not found, then we assume a new one was added
+                    # need to create
+                    if known_tc_case:
+                        # Check for difference between known_tc_case and the variables
+                        # Assume that the tc_case number doesn't change.
+                        if (
+                            not fields_are_same(known_tc_case.case_url, case_url) or
+                            not fields_are_same(known_tc_case.project_name, project_name) or
+                            not fields_are_same(known_tc_case.status, status) or
+                            not fields_are_same(known_tc_case.contact, contact) or
+                            not fields_are_same(known_tc_case.contact_url, contact_url)
+                        ):
+                            known_tc_case.case_url = case_url
+                            known_tc_case.project_name = project_name
+                            known_tc_case.status = status
+                            known_tc_case.contact = contact
+                            known_tc_case.contact_url = contact_url
+
+                            known_tc_case.save()
+                            logger.info("**********************")
+                            logger.info("Updating a text change case (" + str(known_tc_case) + ")")
+                            logger.info("scrape case_number:" + case_number)
+                            logger.info("scrape project_name:" + project_name)
+                            logger.info("**********************")
+
+                    else:
+                        # create a new instance
                         logger.info("**********************")
-                        logger.info("Updating a text change case (" + str(known_tc_case) + ")")
-                        logger.info("scrape case_number:" + case_number)
-                        logger.info("scrape project_name:" + project_name)
+                        logger.info("Creating new site case")
+                        logger.info("case_number:" + case_number)
+                        logger.info("project_name:" + project_name)
                         logger.info("**********************")
 
-                else:
-                    # create a new instance
-                    logger.info("**********************")
-                    logger.info("Creating new site case")
-                    logger.info("case_number:" + case_number)
-                    logger.info("project_name:" + project_name)
-                    logger.info("**********************")
-
-                    TextChangeCases.objects.create(case_number=case_number,
-                                                   case_url=case_url,
-                                                   project_name=project_name,
-                                                   status=status,
-                                                   contact=contact,
-                                                   contact_url=contact_url)
+                        TextChangeCases.objects.create(case_number=case_number,
+                                                       case_url=case_url,
+                                                       project_name=project_name,
+                                                       status=status,
+                                                       contact=contact,
+                                                       contact_url=contact_url)
 
 
 def zoning_requests(page_content):
