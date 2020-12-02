@@ -24,8 +24,8 @@ def send_email_notice(message, email_to):
     else:
         subject = "Message from Develop."
 
-    email_from = "develop@dtraleigh.com"
-
+    email_from = "leo@cophead567.opalstacked.com"
+    print("5")
     send_mail(
         subject,
         message,
@@ -33,6 +33,7 @@ def send_email_notice(message, email_to):
         email_to,
         fail_silently=False,
     )
+    print("6")
     n = datetime.now()
     logger.info("Email sent at " + n.strftime("%H:%M %m-%d-%y"))
 

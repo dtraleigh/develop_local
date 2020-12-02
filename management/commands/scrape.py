@@ -56,9 +56,18 @@ def get_page_content(page_link):
 
 
 def get_rows_in_table(table, page):
-    if table is not None:
-        # We don't want the first row as that is the header row
-        return table.find_all("tr")[1:]
+    try:
+        table_tbody = table.find("tbody")
+        table_rows = table_tbody.find_all("tr")
+        return table_rows
+    except:
+        print("Problem getting to a table trs on page, " + page)
+        if table:
+            print("table: " + table)
+        if table_tbody:
+            print("table_tbody: " + table_tbody)
+        if table_rows:
+            print("rows: " + table_rows)
 
 
 def get_case_number_from_row(row_tds):
