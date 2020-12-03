@@ -104,7 +104,7 @@ class Command(BaseCommand):
                     message += str(x)
 
         # Zoning tables
-        zon_expected = ["Case Number", "Project Name/Location/Description", "Council District", "Contact"]
+        zon_expected = ["Case Number/Status", "Project Name/Location", "Council District", "Contact"]
         zon_tables = get_page_content(zon_page_link).find_all("table")
         for zon_table in zon_tables:
             x = PrettyTable()
