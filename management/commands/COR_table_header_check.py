@@ -106,22 +106,22 @@ class Command(BaseCommand):
         # Zoning tables
         zon_expected = ["Case Number/Status", "Project Name/Location", "Council District", "Contact"]
         zon_tables = get_page_content(zon_page_link).find_all("table")
-        for zon_table in zon_tables:
-            x = PrettyTable()
-            zon_actual = []
-            table_thead = zon_table.find("thead")
-            thead_row = table_thead.find_all("td")
+        # for zon_table in zon_tables:
+        x = PrettyTable()
+        zon_actual = []
+        table_thead = zon_tables[0].find("thead")
+        thead_row = table_thead.find_all("td")
 
-            for header in thead_row:
-                zon_actual.append(header.get_text().strip().replace("\n", ""))
+        for header in thead_row:
+            zon_actual.append(header.get_text().strip().replace("\n", ""))
 
-            if zon_actual == zon_expected:
-                pass
-            else:
-                x.add_row(zon_actual)
-                x.add_row(zon_expected)
-                message = "Zon Table has changed.\n"
-                message += str(x)
+        if zon_actual == zon_expected:
+            pass
+        else:
+            x.add_row(zon_actual)
+            x.add_row(zon_expected)
+            message = "Zon Table has changed.\n"
+            message += str(x)
 
         if message:
             send_email_notice(message, email_admins())

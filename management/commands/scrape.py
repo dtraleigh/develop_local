@@ -58,7 +58,7 @@ def get_page_content(page_link):
 def get_rows_in_table(table, page):
     try:
         table_tbody = table.find("tbody")
-        table_rows = table_tbody.find_all("tr")
+        table_rows = table_tbody.find_all("tr", recursive=False)
         return table_rows
     except:
         print("Problem getting to a table trs on page, " + page)
@@ -419,95 +419,95 @@ def zoning_requests(page_content):
     if page_content:
         zoning_tables = page_content.find_all("table")
 
-        for zoning_table in zoning_tables:
-            zoning_rows = get_rows_in_table(zoning_table, "Zoning")
+        # for zoning_table in zoning_tables:
+        zoning_rows = get_rows_in_table(zoning_tables[0], "Zoning")
 
-            for i in range(0, len(zoning_rows), 2):
-                # First row is zoning_rows[i]
-                # Second row is zoning_rows[i+1]
-                info_row_tds = zoning_rows[i].find_all("td")
-                status_row_tds = zoning_rows[i + 1].find_all("td")
+        for i in range(0, len(zoning_rows), 2):
+            # First row is zoning_rows[i]
+            # Second row is zoning_rows[i+1]
+            info_row_tds = zoning_rows[i].find_all("td")
+            status_row_tds = zoning_rows[i + 1].find_all("td")
 
-                # This gets the zoning case label.
-                # Some cases have a master plan case so label ends up like "Z-14-19MP-1-19"
-                case_number = info_row_tds[0].get_text().split("\n")[0]
-                if "mp" in case_number.lower():
-                    case_number = case_number.lower().split("mp")[0]
+            # This gets the zoning case label.
+            # Some cases have a master plan case so label ends up like "Z-14-19MP-1-19"
+            case_number = info_row_tds[0].get_text().split("\n")[0]
+            if "mp" in case_number.lower():
+                case_number = case_number.lower().split("mp")[0]
 
-                location = info_row_tds[1].get_text()
-                location_url = get_generic_link(info_row_tds[1])
-                # cac = info_row_tds[2].get_text() Now changed to council district which we don't want
-                contact = get_contact(info_row_tds[3])
-                status = status_row_tds[0].get_text()
+            location = info_row_tds[1].get_text()
+            location_url = get_generic_link(info_row_tds[1])
+            # cac = info_row_tds[2].get_text() Now changed to council district which we don't want
+            contact = get_contact(info_row_tds[3])
+            status = status_row_tds[0].get_text()
 
-                zoning_case = case_number.split("\n")[0]
-                plan_url = get_generic_link(info_row_tds[0])
+            zoning_case = case_number.split("\n")[0]
+            plan_url = get_generic_link(info_row_tds[0])
 
-                # Break up zoning_case
-                scrape_num = zoning_case.split("-")[1]
-                scrape_year = "20" + zoning_case.split("-")[2][:2]
+            # Break up zoning_case
+            scrape_num = zoning_case.split("-")[1]
+            scrape_year = "20" + zoning_case.split("-")[2][:2]
 
-                # If any of these variables are None, log it and move on.
-                # Remarks come from the API
-                # Status is from the web scrape
-                if not case_number or not location or not zoning_case or not status:
-                    scraped_info = [["info_row_tds", info_row_tds],
-                                    ["status_row_tds", status_row_tds],
-                                    ["case_number", case_number],
-                                    ["location", location],
-                                    ["location_url", location_url],
-                                    ["contact", contact],
-                                    ["status", status],
-                                    ["plan_url", plan_url]]
-                    message = "scrape.zoning_requests: Problem scraping this row"
-                    message += scraped_info
-                    logger.info(message)
-                    send_email_notice(message, email_admins())
+            # If any of these variables are None, log it and move on.
+            # Remarks come from the API
+            # Status is from the web scrape
+            if not case_number or not location or not zoning_case or not status:
+                scraped_info = [["info_row_tds", info_row_tds],
+                                ["status_row_tds", status_row_tds],
+                                ["case_number", case_number],
+                                ["location", location],
+                                ["location_url", location_url],
+                                ["contact", contact],
+                                ["status", status],
+                                ["plan_url", plan_url]]
+                message = "scrape.zoning_requests: Problem scraping this row"
+                message += scraped_info
+                logger.info(message)
+                send_email_notice(message, email_admins())
 
-                    continue
+                continue
 
-                # First check if we already have this zoning request
-                if Zoning.objects.filter(zpnum=int(scrape_num), zpyear=int(scrape_year)).exists():
-                    known_zon = Zoning.objects.get(zpyear=scrape_year, zpnum=scrape_num)
+            # First check if we already have this zoning request
+            if Zoning.objects.filter(zpnum=int(scrape_num), zpyear=int(scrape_year)).exists():
+                known_zon = Zoning.objects.get(zpyear=scrape_year, zpnum=scrape_num)
 
-                    # If the status, plan_url, or location_url have changed, update the zoning request
-                    if (not fields_are_same(known_zon.status, status) or
-                            not fields_are_same(known_zon.plan_url, plan_url) or
-                            not fields_are_same(known_zon.location_url, location_url)):
-                        # A zoning web scrape only updates status and/or plan_url and/or location_url
-                        known_zon.status = status
-                        known_zon.plan_url = plan_url
-                        known_zon.location_url = location_url
+                # If the status, plan_url, or location_url have changed, update the zoning request
+                if (not fields_are_same(known_zon.status, status) or
+                        not fields_are_same(known_zon.plan_url, plan_url) or
+                        not fields_are_same(known_zon.location_url, location_url)):
+                    # A zoning web scrape only updates status and/or plan_url and/or location_url
+                    known_zon.status = status
+                    known_zon.plan_url = plan_url
+                    known_zon.location_url = location_url
 
-                        known_zon.save()
+                    known_zon.save()
 
-                        # Want to log what the difference is
-                        difference = "*"
-                        if not fields_are_same(known_zon.status, status):
-                            difference += "Difference: " + str(known_zon.status) + " changed to " + str(status)
-                        if not fields_are_same(known_zon.plan_url, plan_url):
-                            difference += "Difference: " + str(known_zon.plan_url) + " changed to " + str(plan_url)
-                        if not fields_are_same(known_zon.location_url, location_url):
-                            difference += "Difference: " + str(known_zon.location_url) + " changed to " + str(location_url)
+                    # Want to log what the difference is
+                    difference = "*"
+                    if not fields_are_same(known_zon.status, status):
+                        difference += "Difference: " + str(known_zon.status) + " changed to " + str(status)
+                    if not fields_are_same(known_zon.plan_url, plan_url):
+                        difference += "Difference: " + str(known_zon.plan_url) + " changed to " + str(plan_url)
+                    if not fields_are_same(known_zon.location_url, location_url):
+                        difference += "Difference: " + str(known_zon.location_url) + " changed to " + str(location_url)
 
-                        logger.info("**********************")
-                        logger.info("Updating a zoning request")
-                        logger.info("known_zon: " + str(known_zon))
-                        logger.info(difference)
-                        logger.info("**********************")
-
-                else:
-                    # We don't know about it so create a new zoning request
                     logger.info("**********************")
-                    logger.info("Creating new Zoning Request from web scrape")
-                    logger.info("case_number:" + zoning_case)
-                    logger.info("location: " + location)
+                    logger.info("Updating a zoning request")
+                    logger.info("known_zon: " + str(known_zon))
+                    logger.info(difference)
                     logger.info("**********************")
 
-                    Zoning.objects.create(zpyear=scrape_year,
-                                          zpnum=scrape_num,
-                                          status=status,
-                                          location=location,
-                                          received_by=contact,
-                                          plan_url=plan_url,
-                                          location_url=location_url)
+            else:
+                # We don't know about it so create a new zoning request
+                logger.info("**********************")
+                logger.info("Creating new Zoning Request from web scrape")
+                logger.info("case_number:" + zoning_case)
+                logger.info("location: " + location)
+                logger.info("**********************")
+
+                Zoning.objects.create(zpyear=scrape_year,
+                                      zpnum=scrape_num,
+                                      status=status,
+                                      location=location,
+                                      received_by=contact,
+                                      plan_url=plan_url,
+                                      location_url=location_url)
