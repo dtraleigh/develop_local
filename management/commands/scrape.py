@@ -422,38 +422,56 @@ def zoning_requests(page_content):
         # for zoning_table in zoning_tables:
         zoning_rows = get_rows_in_table(zoning_tables[0], "Zoning")
 
-        for i in range(0, len(zoning_rows), 2):
-            # First row is zoning_rows[i]
-            # Second row is zoning_rows[i+1]
-            info_row_tds = zoning_rows[i].find_all("td")
-            status_row_tds = zoning_rows[i + 1].find_all("td")
+        for index, row in enumerate(zoning_rows):
+            zoning_row_tds = row.find_all("td")
 
-            # This gets the zoning case label.
-            # Some cases have a master plan case so label ends up like "Z-14-19MP-1-19"
-            case_number = info_row_tds[0].get_text().split("\n")[0]
-            if "mp" in case_number.lower():
-                case_number = case_number.lower().split("mp")[0]
+            # 4 columns
+            case_number_status_col = zoning_row_tds[0]
+            project_name_location_col = zoning_row_tds[1]
+            council_district_col = zoning_row_tds[2]
+            contact_col = zoning_row_tds[3]
 
-            location = info_row_tds[1].get_text()
-            location_url = get_generic_link(info_row_tds[1])
-            # cac = info_row_tds[2].get_text() Now changed to council district which we don't want
-            contact = get_contact(info_row_tds[3])
-            status = status_row_tds[0].get_text()
+            # If council_district_col is empty, let's skip this row
+            if not council_district_col.get_text().strip():
+                continue
 
-            zoning_case = case_number.split("\n")[0]
-            plan_url = get_generic_link(info_row_tds[0])
+            # From case_number_status_col get
+            #  * zpyear
+            #  * zpnum
+            #  * status
+            #  * plan_url
+            case_number_text = case_number_status_col.get_text().split("\n")[0]
+            if "mp" in case_number_text.lower():
+                case_number_text = case_number_text.lower().split("mp")[0]
+
+            zoning_case = case_number_text.split("\n")[0]
 
             # Break up zoning_case
             scrape_num = zoning_case.split("-")[1]
             scrape_year = "20" + zoning_case.split("-")[2][:2]
 
+            try:
+                status = case_number_status_col.find('p').get_text().strip()
+            except AttributeError:
+                # case for when the status is on the second row
+                next_rows_status_col = zoning_rows[index + 1].find_all("td")[0]
+                status = next_rows_status_col.get_text().strip()
+
+            plan_url = get_generic_link(case_number_status_col)
+
+            # From project_name_location_col get location
+            location = project_name_location_col.get_text().strip()
+            location_url = get_generic_link(project_name_location_col)
+
+            # From contact get received_by_col
+            contact = get_contact(contact_col)
+
             # If any of these variables are None, log it and move on.
             # Remarks come from the API
             # Status is from the web scrape
-            if not case_number or not location or not zoning_case or not status:
-                scraped_info = [["info_row_tds", info_row_tds],
-                                ["status_row_tds", status_row_tds],
-                                ["case_number", case_number],
+            if not case_number_text or not location or not zoning_case or not status:
+                scraped_info = [["zoning_row_tds", zoning_row_tds],
+                                ["case_number_text", case_number_text],
                                 ["location", location],
                                 ["location_url", location_url],
                                 ["contact", contact],
